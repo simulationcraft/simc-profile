@@ -16,110 +16,8 @@ SPEC_NAMES = {
     'warrior': ['arms', 'fury', 'protection']
 }
 
-class Profile:
-    path: Path
-    params: list[str]
-
-    def __init__(self, path):
-        self.path = Path(path)
-
-    def __str__(self):
-        return str(self.path)
-
-    def __fspath__(self):
-        return self.path.__fspath__()
-
-    def validate(self):
-        # profiles/<class_name>/<trailing_fragment>.simc
-        # profiles/<class_name>/<spec_name><unnamed>.simc
-        # <class_name>=<class_name>_<spec_name><unnamed>
-        if not self.path.exists():
-            print(f'Path {self} does not exist.')
-            return
-
-        class_name, trailing_fragment, spec_name = self.path_parts()
-        if class_name not in SPEC_NAMES.keys():
-            print(f'Profile {self} is not in a `profiles/<class>/` directory.')
-            return
-
-        if spec_name not in SPEC_NAMES[class_name]:
-            print(f'Profile {self} does not contain a valid specialization name. Try one of {", ".join(SPEC_NAMES[class_name])}.')
-            return
-
-        # python has no way to nicely test if a string contains only printable ascii characters :)
-        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
-            print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
-            return
-
-    def expected_name(self):
-        class_name, trailing_fragment, _ = self.path_parts()
-        return f'{class_name}_{trailing_fragment}'
-
-    def path_parts(self):
-        path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
-        if path_parts[0] != 'profiles':
-            print(f'Profile {self} is not in the `profiles/` directory.')
-            return
-
-        trailing_fragment = path_parts[2].split('.')[:-1][0]
-        return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
-
-class Options:
-    pass
-
 class ParsedOption:
-    key: str
-    operator: str
-    value: str
-
-    parsed: bool
-
-    def __init__(self, line):
-        self.parsed = True
-        try:
-            collect_key = ""
-            quoted = False
-            for c in line:
-                if c == '"' and not quoted:
-                    quoted = True
-                if c == '"' and quoted:
-                    quoted = False
-                if not quoted and c in '+=':
-                    self.key = collect_key
-                    break
-                else:
-                    collect_key += c
-            self.operator = ''
-            for c in line[len(collect_key)]:
-                if c in '+=/':
-                    self.operator += c
-                else:
-                    break
-            self.value = line[len(collect_key) + len(self.operator):]
-        except IndexError:
-            self.key = line
-            self.parsed = False
-
-    def __str__(self):
-        if not self.parsed:
-            return f'Invalid Option {self.key}'
-        return f'{self.key}{self.operator}{self.value}'
-
-    def validate_class(self, profile: Profile):
-        class_name, _, _ = profile.path_parts()
-        return self.parsed and self.key == class_name
-
-    def validate_class_value(self, profile: Profile):
-        return self.parsed and self.validate_class(profile) and self.value == profile.expected_name()
-
-    def validate(self, options: Options):
-        return self.parsed and self.validate_key(options) and self.validate_value(options)
-
-    def validate_key(self, options: Options):
-        return self.parsed and self.key in options.keys
-
-    def validate_value(self, options: Options):
-        return self.parsed and self in options
+    pass
 
 class Option:
     key: str
@@ -207,3 +105,105 @@ HEADER_OPTIONS = Options(
     Option('augmentation', ignore_value=True),
     Option('temporary_enchant', ignore_value=True),
 )
+
+class Profile:
+    path: Path
+    params: list[str]
+
+    def __init__(self, path):
+        self.path = Path(path)
+
+    def __str__(self):
+        return str(self.path)
+
+    def __fspath__(self):
+        return self.path.__fspath__()
+
+    def validate(self):
+        # profiles/<class_name>/<trailing_fragment>.simc
+        # profiles/<class_name>/<spec_name><unnamed>.simc
+        # <class_name>=<class_name>_<spec_name><unnamed>
+        if not self.path.exists():
+            print(f'Path {self} does not exist.')
+            return
+
+        class_name, trailing_fragment, spec_name = self.path_parts()
+        if class_name not in SPEC_NAMES.keys():
+            print(f'Profile {self} is not in a `profiles/<class>/` directory.')
+            return
+
+        if spec_name not in SPEC_NAMES[class_name]:
+            print(f'Profile {self} does not contain a valid specialization name. Try one of {", ".join(SPEC_NAMES[class_name])}.')
+            return
+
+        # python has no way to nicely test if a string contains only printable ascii characters :)
+        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
+            print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
+            return
+
+    def expected_name(self):
+        class_name, trailing_fragment, _ = self.path_parts()
+        return f'{class_name}_{trailing_fragment}'
+
+    def path_parts(self):
+        path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
+        if path_parts[0] != 'profiles':
+            print(f'Profile {self} is not in the `profiles/` directory.')
+            return
+
+        trailing_fragment = path_parts[2].split('.')[:-1][0]
+        return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
+
+class ParsedOption:
+    key: str
+    operator: str
+    value: str
+
+    parsed: bool
+
+    def __init__(self, line):
+        self.parsed = True
+        try:
+            collect_key = ""
+            quoted = False
+            for c in line:
+                if c == '"' and not quoted:
+                    quoted = True
+                if c == '"' and quoted:
+                    quoted = False
+                if not quoted and c in '+=':
+                    self.key = collect_key
+                    break
+                else:
+                    collect_key += c
+            self.operator = ''
+            for c in line[len(collect_key)]:
+                if c in '+=/':
+                    self.operator += c
+                else:
+                    break
+            self.value = line[len(collect_key) + len(self.operator):]
+        except IndexError:
+            self.key = line
+            self.parsed = False
+
+    def __str__(self):
+        if not self.parsed:
+            return f'Invalid Option {self.key}'
+        return f'{self.key}{self.operator}{self.value}'
+
+    def validate_class(self, profile: Profile):
+        class_name, _, _ = profile.path_parts()
+        return self.parsed and self.key == class_name
+
+    def validate_class_value(self, profile: Profile):
+        return self.parsed and self.validate_class(profile) and self.value == profile.expected_name()
+
+    def validate(self, options: Options):
+        return self.parsed and self.validate_key(options) and self.validate_value(options)
+
+    def validate_key(self, options: Options):
+        return self.parsed and self.key in options.keys
+
+    def validate_value(self, options: Options):
+        return self.parsed and self in options
