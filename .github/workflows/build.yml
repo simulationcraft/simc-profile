@@ -13,10 +13,9 @@ jobs:
           repository: simulationcraft/simc
           path: simc/
 
-      - name: whereami
+      - name: install
         run: |
-          tree
-          pwd
+          sudo apt-get install -y libcurl4-openssl-dev
 
       - name: configure
         run: |
