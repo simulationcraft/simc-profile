@@ -15,7 +15,12 @@ jobs:
       - name: modified_files
         run: |
           cd ${{ runner.workspace }}/simc-profile/
-          echo "MODIFIED_FILES=$(git diff --name-only HEAD^1 HEAD -- '***.simc' | xargs)" >> $GITHUB_ENV
+          files=$(git diff --name-only HEAD^1 HEAD -- '***.simc'
+          if [[ -n "$files" ]]; then
+            echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+          else
+            exit 1
+          fi
 
       - name: validate
         # if: ${{ env.MODIFIED_FILES }} != ''
