@@ -11,7 +11,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: simulationcraft/simc
-          path: simc/
 
       # - name: install
       #   run: |
@@ -19,21 +18,20 @@ jobs:
 
       - name: configure
         run: |
-          cmake -H'${{ runner.workspace }}/simc-profile/simc/' \
-          -B'${{ runner.workspace }}/simc-profile/simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
+          cmake -H. \
+          -B'${{ runner.workspace }}/b/ninja' -GNinja -DBUILD_GUI=OFF \
           -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
           -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
 
       - name: build
         run: |
-          ninja -C '${{ runner.workspace }}/simc/b/ninja'
+          ninja -C '${{ runner.workspace }}/b/ninja'
 
       - name: ident
         run: |
-          cd '${{ runner.workspace }}/simc'
           git rev-parse HEAD
 
       - uses: actions/cache@v5
         with:
-          path: ${{ runner.workspace }}/simc/b/ninja/simc
+          path: ${{ runner.workspace }}/b/ninja/simc
           key: simc-clang++-18-cpp17-${{ github.sha }}
