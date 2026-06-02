@@ -16,6 +16,7 @@ jobs:
       - name: whereami
         run: |
           tree
+          pwd
 
       - name: configure
         run: |
