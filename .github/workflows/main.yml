@@ -13,10 +13,12 @@ jobs:
           fetch-depth: 2
 
       - name: modified_files
+        continue-on-error: true
         run: |
           cd ${{ runner.workspace }}/simc-profile/
           files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
           if [[ -n "$files" ]]; then
+            echo $files
             echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
           else
             exit 1
