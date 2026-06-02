@@ -1,4 +1,7 @@
-# name: validate
+name: validate
+
+on:
+  workflow_call
 
 # jobs:
 #   validate:
