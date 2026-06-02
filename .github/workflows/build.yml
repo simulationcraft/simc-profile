@@ -23,15 +23,15 @@ jobs:
         run: |
           echo "SHA=$(git rev-parse HEAD)" >> "GITHUB_ENV"
           echo $SHA
+          echo ${{ env.SHA }}
+          echo ${{ env.sha }}
 
-      - name: test
-        run: echo ${{ env.sha }}
-
-      - name: build
-        run: |
-          ninja -C '${{ runner.workspace }}/b/ninja'
+      # - name: build
+      #   run: |
+      #     ninja -C '${{ runner.workspace }}/b/ninja'
 
       - uses: actions/cache@v5
         with:
-          path: ${{ runner.workspace }}/b/ninja/simc
-          key: simc-clang++-18-cpp17-${{ env.SHA }}
+          # path: ${{ runner.workspace }}/b/ninja/simc
+          path: ${{ runner.workspace }}/README.md
+          key: simc-clang++-18-cpp17-${{ env.sha }}
