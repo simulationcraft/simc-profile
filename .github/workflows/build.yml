@@ -9,7 +9,8 @@ jobs:
         with:
           repository: simulationcraft/simc
           path: simc/
-          sparse-checkout: !SpellDataDump/
+          sparse-checkout: |
+            '!SpellDataDump/'
 
       - name: configure
         run: |
