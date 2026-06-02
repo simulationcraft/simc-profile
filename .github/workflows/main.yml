@@ -16,6 +16,6 @@ jobs:
         run: |
           tree
           cd ${{ runner.workspace }}/simc-profile/
-          git diff --name-only HEAD^1 HEAD
+          git diff --name-only HEAD^1 HEAD | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
 
       # - uses: ./.github/workflows/setup_simc.yml
