@@ -13,6 +13,7 @@ jobs:
           repository: simulationcraft/simc
           path: simc/
           sparse-checkout: |
+            '**/'
             '!SpellDataDump/'
 
       - name: whereami
