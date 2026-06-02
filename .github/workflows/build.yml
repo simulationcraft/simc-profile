@@ -25,12 +25,10 @@ jobs:
 
       - name: ident
         run: |
-          export SHA=$(git rev-parse HEAD)
+          git rev-parse HEAD >> $SHA
           echo $SHA
 
       - uses: actions/cache@v5
-        env:
-          SHA
         with:
           path: ${{ runner.workspace }}/b/ninja/simc
           key: simc-clang++-18-cpp17-${{ env.SHA }}
