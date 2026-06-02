@@ -15,6 +15,10 @@ jobs:
           sparse-checkout: |
             '!SpellDataDump/'
 
+      - name: whereami
+        run: |
+          tree
+
       - name: configure
         run: |
           cmake -H'${{ runner.workspace }}/simc/' -B'${{ runner.workspace }}/simc/b/ninja' -GNinja -DBUILD_GUI=OFF
