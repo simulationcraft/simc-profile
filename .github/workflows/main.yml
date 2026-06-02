@@ -15,7 +15,7 @@ jobs:
       - name: modified_files
         run: |
           cd ${{ runner.workspace }}/simc-profile/
-          files=$(git diff --name-only HEAD^1 HEAD -- '***.simc')
+          files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
           if [[ -n "$files" ]]; then
             echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
           else
