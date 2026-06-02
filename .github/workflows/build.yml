@@ -34,4 +34,4 @@ jobs:
         with:
           # path: ${{ runner.workspace }}/b/ninja/simc
           path: ${{ runner.workspace }}/README.md
-          key: simc-clang++-18-cpp17-${{ env.sha }}
+          key: simc-clang++-18-cpp17-${{ env.SHA }}
