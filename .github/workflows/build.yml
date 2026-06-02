@@ -24,6 +24,9 @@ jobs:
           echo "SHA=$(git rev-parse HEAD)" >> "GITHUB_ENV"
           echo $SHA
 
+      - name: test
+        run: echo ${{ env.sha }}
+
       - name: build
         run: |
           ninja -C '${{ runner.workspace }}/b/ninja'
