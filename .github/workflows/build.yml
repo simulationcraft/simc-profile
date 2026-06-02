@@ -19,19 +19,15 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
           -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
 
-      - name: ident
+      - name: build
+        run: |
+          ninja -C '${{ runner.workspace }}/b/ninja'
+
+      - name: cache_key
         run: |
           echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo $SHA
-          echo ${{ env.SHA }}
-          echo ${{ env.sha }}
-
-      # - name: build
-      #   run: |
-      #     ninja -C '${{ runner.workspace }}/b/ninja'
 
       - uses: actions/cache@v5
         with:
-          # path: ${{ runner.workspace }}/b/ninja/simc
-          path: ${{ runner.workspace }}/README.md
+          path: ${{ runner.workspace }}/b/ninja/simc
           key: simc-clang++-18-cpp17-${{ env.SHA }}
