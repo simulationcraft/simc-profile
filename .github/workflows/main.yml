@@ -3,10 +3,15 @@ name: CI
 on: [pull_request, push]
 
 jobs:
-  # ci:
-  #   runs-on: ubuntu-latest
+  CI:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/cache/restore@v5
-  build:
-    uses: ./.github/workflows/build.yml
+    steps:
+      - uses: actions/checkout@v6
+        path: ${{ runner.workspace }}/simc-profile/
+
+      - name: validate
+        run: |
+          git diff-tree --no-commit-id --name-only HAED -r | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
+
+      # - uses: ./.github/workflows/setup_simc.yml
