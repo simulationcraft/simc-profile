@@ -8,7 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-        path: ${{ runner.workspace }}/simc-profile/
+        with:
+          path: ${{ runner.workspace }}/simc-profile/
 
       - name: validate
         run: |
