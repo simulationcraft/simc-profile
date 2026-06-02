@@ -13,6 +13,6 @@ jobs:
 
       - name: validate
         run: |
-          git diff-tree --no-commit-id --name-only HAED -r | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
+          git diff-tree --no-commit-id --name-only HEAD -r | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
 
       # - uses: ./.github/workflows/setup_simc.yml
