@@ -13,6 +13,7 @@ jobs:
 
       - name: validate
         run: |
+          tree
           cd ${{ runner.workspace }}/simc-profile/
           git diff-tree --no-commit-id --name-only HEAD -r
 
