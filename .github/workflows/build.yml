@@ -13,17 +13,16 @@ jobs:
           repository: simulationcraft/simc
           path: simc/
 
-      - name: install
-        run: |
-          sudo apt-get install -y libcurl4-openssl-dev
+      # - name: install
+      #   run: |
+      #     sudo apt-get install -y libcurl4-openssl-dev
 
       - name: configure
         run: |
-          cmake -H'${{ runner.workspace }}/simc-profile/simc/' -B'${{ runner.workspace }}/simc-profile/simc/b/ninja' -GNinja -DBUILD_GUI=OFF
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_CXX_COMPILER=clang++-18
-          -DCMAKE_CXX_STANDARD=17
-          -SC_NO_NETWORKING=ON
+          cmake -H'${{ runner.workspace }}/simc-profile/simc/' \
+          -B'${{ runner.workspace }}/simc-profile/simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
+          -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
+          -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
 
       - name: build
         run: |
