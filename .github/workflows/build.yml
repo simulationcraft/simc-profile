@@ -12,10 +12,6 @@ jobs:
         with:
           repository: simulationcraft/simc
 
-      # - name: install
-      #   run: |
-      #     sudo apt-get install -y libcurl4-openssl-dev
-
       - name: configure
         run: |
           cmake -H. \
@@ -33,6 +29,8 @@ jobs:
           echo $SHA
 
       - uses: actions/cache@v5
+        env:
+          SHA
         with:
           path: ${{ runner.workspace }}/b/ninja/simc
           key: simc-clang++-18-cpp17-${{ env.SHA }}
