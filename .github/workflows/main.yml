@@ -17,14 +17,14 @@ jobs:
         run: |
           cd ${{ runner.workspace }}/simc-profile/
           git show --diff-filter=AM --no-commit-id --name-only HEAD
-          files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
-          echo $files
-          echo $($files)
-          if [[ -n "$files" ]]; then
-            echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
-          else
-            exit 1
-          fi
+          # files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
+          # echo $files
+          # echo $($files)
+          # if [[ -n "$files" ]]; then
+          #   echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+          # else
+          #   exit 1
+          # fi
 
       - name: validate
         # if: ${{ env.MODIFIED_FILES }} != ''
