@@ -17,7 +17,7 @@ jobs:
           files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc')
           echo $files
           if [[ -n "$files" ]]; then
-            echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+            echo "MODIFIED_FILES='$files'" >> $GITHUB_ENV
           else
             exit 1
           fi
