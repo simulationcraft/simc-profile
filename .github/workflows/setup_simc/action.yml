@@ -18,9 +18,11 @@ runs:
 
     - uses: actions/cache/restore@v5
       id: restore_cache
+      continue-on-error: true
       with:
         path: ${{ runner.workspace }}/simc/b/ninja/simc
         key: simc-clang++-18-cpp17-${{ env.SHA }}
+        fail-on-cache-miss: true
 
     - uses: ./.github/workflows/build.yml
       if: steps.restore_cache.outcome == 'failure'

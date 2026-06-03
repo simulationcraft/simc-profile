@@ -37,10 +37,10 @@ jobs:
 
       - name: validate_simc
         run: |
-          python ${{ runner.workspace }}/simc-profile/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc/b/ninja/simc --save /dev/null
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc/b/ninja/simc --save /dev/null
           # python ${{ runner.workspace }}/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc/b/ninja/simc --save /dev/null
 
       - name: execute_simc
         run: |
-          python ${{ runner.workspace }}/simc-profile/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc/b/ninja/simc --execute
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc/b/ninja/simc --execute
           # python ${{ runner.workspace }}/scripts/execute.py ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc/b/ninja/simc --execute
