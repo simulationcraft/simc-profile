@@ -16,6 +16,7 @@ jobs:
         continue-on-error: true
         run: |
           cd ${{ runner.workspace }}/simc-profile/
+          git show --diff-filter=AM --no-commit-id --name-only HEAD
           files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
           echo $files
           echo $($files)
