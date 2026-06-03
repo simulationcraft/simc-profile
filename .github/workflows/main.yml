@@ -12,6 +12,9 @@ jobs:
           # path: ${{ runner.workspace }}/simc-profile/
           fetch-depth: 2
 
+      - run: |
+          tree -a
+
       - name: modified_files
         continue-on-error: true
         run: |
