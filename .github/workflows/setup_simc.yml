@@ -26,5 +26,5 @@ jobs:
           path: ${{ runner.workspace }}/simc/b/ninja/simc
           key: simc-clang++-18-cpp17-${{ env.SHA }}
 
-      - uses: ./.github/workflows/build
+      - uses: ./.github/workflows/build.yml
         if: steps.restore_cache.outcome == 'failure'
