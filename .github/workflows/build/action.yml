@@ -20,9 +20,9 @@ runs:
     - name: cache_key
       shell: bash
       run: |
-        cd simc/
+        cd simc-profile/simc/
         echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-        cd ..
+        cd ../..
 
     - uses: actions/cache@v5
       with:
