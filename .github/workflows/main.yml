@@ -13,6 +13,7 @@ jobs:
           fetch-depth: 2
 
       - run: |
+          pwd
           tree -a
 
       - name: modified_files
