@@ -20,7 +20,7 @@ runs:
       id: restore_cache
       continue-on-error: true
       with:
-        path: ${{ runner.workspace }}/simc/b/ninja/simc
+        path: simc-profile/simc/b/ninja/simc
         key: simc-clang++-18-cpp17-${{ env.SHA }}
 
     - uses: ./.github/workflows/build
