@@ -1,0 +1,29 @@
+name: build
+
+runs:
+  runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        repository: simulationcraft/simc
+
+    - name: configure
+      run: |
+        cmake -H. \
+        -B'${{ runner.workspace }}/b/ninja' -GNinja -DBUILD_GUI=OFF \
+        -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
+        -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
+
+    - name: build
+      run: |
+        ninja -C '${{ runner.workspace }}/b/ninja'
+
+    - name: cache_key
+      run: |
+        echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+    - uses: actions/cache@v5
+      with:
+        path: ${{ runner.workspace }}/b/ninja/simc
+        key: simc-clang++-18-cpp17-${{ env.SHA }}

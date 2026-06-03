@@ -1,0 +1,27 @@
+name: setup_simc
+
+runs:
+  runs-on: ubuntu-latest
+  using: 'composite'
+
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        repository: simulationcraft/simc
+        path: ${{ runner.workspace }}/simc/
+        sparse-checkout: 'LICENSE'
+
+    - name: cache_key
+      run: |
+        cd ${{ runner.workspace }}/simc/
+        echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        cd ${{ runner.workspace }}
+
+    - uses: actions/cache/restore@v5
+      id: restore_cache
+      with:
+        path: ${{ runner.workspace }}/simc/b/ninja/simc
+        key: simc-clang++-18-cpp17-${{ env.SHA }}
+
+    - uses: ./.github/workflows/build.yml
+      if: steps.restore_cache.outcome == 'failure'
