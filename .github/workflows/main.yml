@@ -29,7 +29,7 @@ jobs:
           python ${{ runner.workspace }}/simc-profile/scripts/validate.py ${{ env.MODIFIED_FILES }}
           # python ${{ runner.workspace }}/scripts/validate.py ${{ env.MODIFIED_FILES }}
 
-      - uses: ./simc-profile/.github/workflows/setup_simc
+      - uses: ./.github/workflows/setup_simc
 
       - name: validate_simc
         run: |
