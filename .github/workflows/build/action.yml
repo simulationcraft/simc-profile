@@ -1,7 +1,7 @@
 name: build
 
 runs:
-  runs-on: ubuntu-latest
+  using: 'composite'
 
   steps:
     - uses: actions/checkout@v6

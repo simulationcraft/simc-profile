@@ -1,7 +1,6 @@
 name: setup_simc
 
 runs:
-  runs-on: ubuntu-latest
   using: 'composite'
 
   steps:
