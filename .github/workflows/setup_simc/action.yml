@@ -7,14 +7,14 @@ runs:
     - uses: actions/checkout@v6
       with:
         repository: simulationcraft/simc
-        path: simc/
+        path: simc-profile/simc/
 
     - name: cache_key
       shell: bash
       run: |
-        cd simc/
+        cd simc-profile/simc/
         echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-        cd ..
+        cd ../..
 
     - uses: actions/cache/restore@v5
       id: restore_cache

@@ -7,15 +7,15 @@ runs:
     - name: configure
       shell: bash
       run: |
-        cmake -H. \
-        -B'simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
+        cmake -H'simc-profile/simc/ \
+        -B'simc-profile/simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
         -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
         -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
 
     - name: build
       shell: bash
       run: |
-        ninja -C 'simc/b/ninja'
+        ninja -C 'simc-profile/simc/b/ninja'
 
     - name: cache_key
       shell: bash
@@ -26,5 +26,5 @@ runs:
 
     - uses: actions/cache@v5
       with:
-        path: ${{ runner.workspace }}/b/ninja/simc
+        path: simc-profile/simc/b/ninja/simc
         key: simc-clang++-18-cpp17-${{ env.SHA }}
