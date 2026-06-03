@@ -9,6 +9,8 @@ def validate_header_option(line):
 
 def generate_simc_input(profiles: list[Profile]):
     for profile in profiles:
+        profile.validate()
+
         profile.params = []
         with open(profile) as handle:
             header = True

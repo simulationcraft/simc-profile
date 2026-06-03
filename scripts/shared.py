@@ -133,7 +133,7 @@ class Profile:
             return
 
         if spec_name not in SPEC_NAMES[class_name]:
-            print(f'Profile {self} does not contain a valid specialization name. Try one of {", ".join(SPEC_NAMES[class_name])}.')
+            print(f'Profile {self} does not contain a valid specialization name. It should include one of {", ".join(SPEC_NAMES[class_name])}.')
             return
 
         # python has no way to nicely test if a string contains only printable ascii characters :)

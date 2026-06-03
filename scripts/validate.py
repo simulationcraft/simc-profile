@@ -28,6 +28,7 @@ parser.add_argument('filenames', nargs='+', type=Profile)
 args = parser.parse_args()
 
 for profile in args.filenames:
+    profile.validate()
     class_name, trailing_fragment, _ = profile.path_parts()
 
     with open(profile) as handle:
