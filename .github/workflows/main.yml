@@ -18,7 +18,6 @@ jobs:
           cd ${{ runner.workspace }}/simc-profile/
           files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc')
           echo $files
-          echo $($files)
           if [[ -n "$files" ]]; then
             echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
           else
@@ -28,8 +27,8 @@ jobs:
       - name: validate
         # if: ${{ env.MODIFIED_FILES }} != ''
         run: |
-          echo ${{ env.MODIFIED_FILES }}
-          find ${{ runner.workspace }}/simc-profile/profiles -type f | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
-          # python ${{ runner.workspace }}/simc-profile/scripts/validate.py ${{ env.MODIFIED_FILES }}
+          # echo ${{ env.MODIFIED_FILES }}
+          # find ${{ runner.workspace }}/simc-profile/profiles -type f | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
+          python ${{ runner.workspace }}/simc-profile/scripts/validate.py ${{ env.MODIFIED_FILES }}
 
       # - uses: ./.github/workflows/setup_simc.yml
