@@ -4,27 +4,25 @@ runs:
   using: 'composite'
 
   steps:
-    - uses: actions/checkout@v6
-      with:
-        repository: simulationcraft/simc
-
     - name: configure
       shell: bash
       run: |
         cmake -H. \
-        -B'${{ runner.workspace }}/b/ninja' -GNinja -DBUILD_GUI=OFF \
+        -B'simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
         -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
         -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
 
     - name: build
       shell: bash
       run: |
-        ninja -C '${{ runner.workspace }}/b/ninja'
+        ninja -C 'simc/b/ninja'
 
     - name: cache_key
       shell: bash
       run: |
+        cd simc/
         echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        cd ..
 
     - uses: actions/cache@v5
       with:

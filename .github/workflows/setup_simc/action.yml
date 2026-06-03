@@ -7,15 +7,14 @@ runs:
     - uses: actions/checkout@v6
       with:
         repository: simulationcraft/simc
-        path: ${{ runner.workspace }}/simc/
-        sparse-checkout: 'LICENSE'
+        path: simc/
 
     - name: cache_key
       shell: bash
       run: |
-        cd ${{ runner.workspace }}/simc/
+        cd simc/
         echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-        cd ${{ runner.workspace }}
+        cd ..
 
     - uses: actions/cache/restore@v5
       id: restore_cache
