@@ -25,3 +25,5 @@ runs:
 
     - uses: ./.github/workflows/build
       if: steps.restore_cache.outputs.cache-hit != 'true'
+      with:
+        cache-key: ${{ env.SHA }}
