@@ -29,6 +29,10 @@ jobs:
 
       - uses: ./.github/workflows/setup_simc
 
+      - run: |
+          pwd
+          tree
+
       - name: validate_simc
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
