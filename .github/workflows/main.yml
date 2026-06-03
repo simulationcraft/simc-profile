@@ -16,15 +16,14 @@ jobs:
         continue-on-error: true
         run: |
           cd ${{ runner.workspace }}/simc-profile/
-          git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc'
-          # files=$(git show --diff-filter=AM --no-commit-id --name-only HEAD -- '***.simc')
-          # echo $files
-          # echo $($files)
-          # if [[ -n "$files" ]]; then
-          #   echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
-          # else
-          #   exit 1
-          # fi
+          files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc')
+          echo $files
+          echo $($files)
+          if [[ -n "$files" ]]; then
+            echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+          else
+            exit 1
+          fi
 
       - name: validate
         # if: ${{ env.MODIFIED_FILES }} != ''
