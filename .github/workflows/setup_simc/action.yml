@@ -11,6 +11,7 @@ runs:
         sparse-checkout: 'LICENSE'
 
     - name: cache_key
+      shell: bash
       run: |
         cd ${{ runner.workspace }}/simc/
         echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -22,5 +23,5 @@ runs:
         path: ${{ runner.workspace }}/simc/b/ninja/simc
         key: simc-clang++-18-cpp17-${{ env.SHA }}
 
-    - uses: ./.github/workflows/build.yml
+    - uses: .github/workflows/build.yml
       if: steps.restore_cache.outcome == 'failure'
