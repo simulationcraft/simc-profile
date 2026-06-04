@@ -50,7 +50,8 @@ def run_profiles(binary: Path, profiles: list[Profile]):
     prefix = [
         'output=/dev/null',
         'target_error=0.05',
-        'json=/tmp/out.json'
+        'json=output.json',
+        'html=output.html'
     ]
     return run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
 
