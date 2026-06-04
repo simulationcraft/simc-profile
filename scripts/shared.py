@@ -24,22 +24,27 @@ class Option:
     ignore_value: bool
     values: list[str]
     case_sensitive: bool
+    scope: str
 
-    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True):
+    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True, scope='player'):
         self.key = key
         self.values = values
         self.ignore_value = ignore_value
         self.case_sensitive = case_sensitive
+        self.scope = scope
 
     def __eq__(self, other: ParsedOption):
-        if self.key != other.key:
-            return False
-        if self.ignore_value:
-            return True
-        if self.case_sensitive:
-            return other.value in self.values
-        else:
-            return other.value.lower() in self.values
+        if isinstance(other, ParsedOption):
+            if self.key != other.key:
+                return False
+            if self.ignore_value:
+                return True
+            if self.case_sensitive:
+                return other.value in self.values
+            else:
+                return other.value.lower() in self.values
+        assert False
+        return False
 
 class Options:
     options: list[Option]
@@ -51,6 +56,10 @@ class Options:
 
     def __contains__(self, other):
         return other in self.options
+
+    def __iter__(self):
+        for option in self.options:
+            yield option
 
 # class (handled separately as value depends on filename)
 SIMC_OPTIONS = Options(
@@ -96,14 +105,14 @@ SIMC_OPTIONS = Options(
     Option('warlock.default_pet', ['sayaad', 'succubus', 'incubus', 'felguard']),
 )
 HEADER_OPTIONS = Options(
-    Option('desired_targets', ignore_value=True),
-    Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice']),
-    Option('source', ['default']),
-    Option('potion', ignore_value=True),
-    Option('flask', ignore_value=True),
-    Option('food', ignore_value=True),
-    Option('augmentation', ignore_value=True),
-    Option('temporary_enchant', ignore_value=True),
+    Option('desired_targets', ignore_value=True, scope='sim'),
+    Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
+    Option('source', ['default'], scope='player'),
+    Option('potion', ignore_value=True, scope='player'),
+    Option('flask', ignore_value=True, scope='player'),
+    Option('food', ignore_value=True, scope='player'),
+    Option('augmentation', ignore_value=True, scope='player'),
+    Option('temporary_enchant', ignore_value=True, scope='player'),
 )
 
 class Profile:
@@ -125,21 +134,26 @@ class Profile:
         # <class_name>=<class_name>_<spec_name><unnamed>
         if not self.path.exists():
             print(f'Path {self} does not exist.')
-            return
+            return False
 
         class_name, trailing_fragment, spec_name = self.path_parts()
+        if not class_name and not trailing_fragment and not spec_name:
+            return False
+
         if class_name not in SPEC_NAMES.keys():
             print(f'Profile {self} is not in a `profiles/<class>/` directory.')
-            return
+            return False
 
         if spec_name not in SPEC_NAMES[class_name]:
-            print(f'Profile {self} does not contain a valid specialization name. Try one of {", ".join(SPEC_NAMES[class_name])}.')
-            return
+            print(f'Profile {self} does not contain a valid specialization name. It should include one of {", ".join(SPEC_NAMES[class_name])}.')
+            return False
 
         # python has no way to nicely test if a string contains only printable ascii characters :)
         if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
             print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
-            return
+            return False
+
+        return True
 
     def expected_name(self):
         class_name, trailing_fragment, _ = self.path_parts()
@@ -149,7 +163,7 @@ class Profile:
         path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
         if path_parts[0] != 'profiles':
             print(f'Profile {self} is not in the `profiles/` directory.')
-            return
+            return False, False, False
 
         trailing_fragment = path_parts[2].split('.')[:-1][0]
         return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
@@ -191,6 +205,9 @@ class ParsedOption:
         if not self.parsed:
             return f'Invalid Option {self.key}'
         return f'{self.key}{self.operator}{self.value}'
+
+    def scope(self, options: Options):
+        return next((o for o in options if o == self)).scope
 
     def validate_class(self, profile: Profile):
         class_name, _, _ = profile.path_parts()

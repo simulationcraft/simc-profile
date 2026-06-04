@@ -1,0 +1,27 @@
+name: build
+
+inputs:
+  cache-key:
+    required: true
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: configure
+      shell: bash
+      run: |
+        cmake -H'simc-profile/simc/' \
+        -B'simc-profile/simc/b/ninja' -GNinja -DBUILD_GUI=OFF \
+        -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-18 \
+        -DCMAKE_CXX_STANDARD=17 -DSC_NO_NETWORKING=ON
+
+    - name: build
+      shell: bash
+      run: |
+        ninja -C 'simc-profile/simc/b/ninja'
+
+    - uses: actions/cache/save@v5
+      with:
+        path: simc-profile/simc/b/ninja/simc
+        key: simc-clang++-18-cpp17-${{ inputs.cache-key }}

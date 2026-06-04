@@ -1,0 +1,33 @@
+name: setup_simc
+
+outputs:
+  rebuilt-simc:
+    value: ${{ !steps.restore_cache.outputs.cache-hit }}
+
+runs:
+  using: 'composite'
+
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        repository: simulationcraft/simc
+        path: simc-profile/simc/
+
+    - name: cache_key
+      shell: bash
+      run: |
+        cd simc-profile/simc/
+        echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        cd ../..
+
+    - uses: actions/cache/restore@v5
+      id: restore_cache
+      continue-on-error: true
+      with:
+        path: simc-profile/simc/b/ninja/simc
+        key: simc-clang++-18-cpp17-${{ env.SHA }}
+
+    - uses: ./.github/workflows/build
+      if: steps.restore_cache.outputs.cache-hit != 'true'
+      with:
+        cache-key: ${{ env.SHA }}

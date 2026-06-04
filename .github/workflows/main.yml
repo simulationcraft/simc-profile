@@ -3,5 +3,53 @@ name: CI
 on: [pull_request, push]
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
+  CI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: modified_files
+        run: |
+          files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc' | xargs)
+          echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+
+      - name: validate_python
+        run: |
+          python ${{ runner.workspace }}/simc-profile/scripts/validate.py \
+          ${{ env.MODIFIED_FILES }}
+
+      - uses: ./.github/workflows/setup_simc
+        id: setup
+
+      - name: validate_simc_pr
+        if: github.event_name == 'pull_request'
+        run: |
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --save .
+
+      - name: execute_simc_pr
+        if: github.event_name == 'pull_request'
+        run: |
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --execute
+
+      - name: validate_simc_main
+        if: github.event_name == 'push' && ( success() || failure() ) && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --save .
+
+      - name: execute_simc_main
+        if: github.event_name == 'push' && ( success() || failure() ) && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --execute
