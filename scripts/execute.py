@@ -7,27 +7,44 @@ from shared import ParsedOption, Profile, HEADER_OPTIONS
 def validate_header_option(line):
     return ParsedOption(line).validate(HEADER_OPTIONS)
 
+def handle_header_line(line, deferral_list):
+    option = ParsedOption(line)
+    if option.validate(HEADER_OPTIONS):
+        if option.scope(HEADER_OPTIONS) == 'player':
+            deferral_list.append(line)
+            return ''
+        else:
+            return line
+    return ''
+
 def generate_simc_input(profiles: list[Profile]):
     for profile in profiles:
         profile.validate()
 
         profile.params = []
+        deferred_options = []
+        push_deferred_options = False
         with open(profile) as handle:
             header = True
             for line in handle.readlines():
                 line = line.strip()
                 if not len(line):
                     continue
-                if line[0] == '#':
-                    if header and validate_header_option(line[1:].strip()):
-                        line = line[1:].strip()
-                    else:
-                        line = ''
+                if line[0] == '#' and header:
+                    line = handle_header_line(line[1:].strip(), deferred_options)
+                elif line[0] == '#' and not header:
+                    line = ''
                 else:
+                    option = ParsedOption(line)
+                    if option.validate_class(profile) and option.validate_class_value(profile):
+                        push_deferred_options = True
                     header = False
 
                 if line != '':
                     profile.params.append(line)
+                if push_deferred_options:
+                    profile.params += deferred_options
+                    deferred_options = []
 
 def run_sim(binary: Path, profiles: list[str], prefix: list[str], suffix: list[str] = []):
     proc = subprocess.Popen([binary] + prefix + profiles + suffix, stdout=sys.stdout, stderr=sys.stderr)

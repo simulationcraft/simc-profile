@@ -24,22 +24,27 @@ class Option:
     ignore_value: bool
     values: list[str]
     case_sensitive: bool
+    scope: str
 
-    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True):
+    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True, scope='player'):
         self.key = key
         self.values = values
         self.ignore_value = ignore_value
         self.case_sensitive = case_sensitive
+        self.scope = scope
 
     def __eq__(self, other: ParsedOption):
-        if self.key != other.key:
-            return False
-        if self.ignore_value:
-            return True
-        if self.case_sensitive:
-            return other.value in self.values
-        else:
-            return other.value.lower() in self.values
+        if isinstance(other, ParsedOption):
+            if self.key != other.key:
+                return False
+            if self.ignore_value:
+                return True
+            if self.case_sensitive:
+                return other.value in self.values
+            else:
+                return other.value.lower() in self.values
+        assert False
+        return False
 
 class Options:
     options: list[Option]
@@ -51,6 +56,10 @@ class Options:
 
     def __contains__(self, other):
         return other in self.options
+
+    def __iter__(self):
+        for option in self.options:
+            yield option
 
 # class (handled separately as value depends on filename)
 SIMC_OPTIONS = Options(
@@ -96,14 +105,14 @@ SIMC_OPTIONS = Options(
     Option('warlock.default_pet', ['sayaad', 'succubus', 'incubus', 'felguard']),
 )
 HEADER_OPTIONS = Options(
-    Option('desired_targets', ignore_value=True),
-    Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice']),
-    Option('source', ['default']),
-    Option('potion', ignore_value=True),
-    Option('flask', ignore_value=True),
-    Option('food', ignore_value=True),
-    Option('augmentation', ignore_value=True),
-    Option('temporary_enchant', ignore_value=True),
+    Option('desired_targets', ignore_value=True, scope='sim'),
+    Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
+    Option('source', ['default'], scope='player'),
+    Option('potion', ignore_value=True, scope='player'),
+    Option('flask', ignore_value=True, scope='player'),
+    Option('food', ignore_value=True, scope='player'),
+    Option('augmentation', ignore_value=True, scope='player'),
+    Option('temporary_enchant', ignore_value=True, scope='player'),
 )
 
 class Profile:
@@ -196,6 +205,9 @@ class ParsedOption:
         if not self.parsed:
             return f'Invalid Option {self.key}'
         return f'{self.key}{self.operator}{self.value}'
+
+    def scope(self, options: Options):
+        return next((o for o in options if o == self)).scope
 
     def validate_class(self, profile: Profile):
         class_name, _, _ = profile.path_parts()
