@@ -33,9 +33,12 @@ def parse_simc_option(line, profile):
     return True
 
 parser = ArgumentParser(prog='SimulationCraft Profile Validator')
-parser.add_argument('filenames', nargs='+', type=Profile)
+parser.add_argument('filenames', nargs='*', type=Profile)
 
 args = parser.parse_args()
+
+if not len(args.filenames):
+    exit(0)
 
 success = True
 

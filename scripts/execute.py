@@ -73,7 +73,7 @@ def run_profiles(binary: Path, profiles: list[Profile]):
     return run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
 
 parser = ArgumentParser(prog='SimulationCraft Profile Runner')
-parser.add_argument('filenames', nargs='+', type=Profile)
+parser.add_argument('filenames', nargs='*', type=Profile)
 parser.add_argument('-b', '--binary', type=Path, required=True, metavar='PATH')
 parser.add_argument('--save', type=Path, default=False, metavar='PATH', help='root directory to save all profiles')
 parser.add_argument('--execute', action='store_true', default=False, help='execute profiles')
@@ -81,6 +81,9 @@ parser.add_argument('--execute', action='store_true', default=False, help='execu
 args = parser.parse_args()
 
 generate_simc_input(args.filenames)
+
+if not len(args.filenames):
+    exit(0)
 
 rc = []
 if args.save:
