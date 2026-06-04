@@ -12,15 +12,9 @@ jobs:
           fetch-depth: 2
 
       - name: modified_files
-        continue-on-error: true
         run: |
           files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc' | xargs)
-          echo $files
-          # if [[ -n "$files" ]]; then
           echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
-          # else
-          #   exit 2
-          # fi
 
       - name: validate_python
         run: |
@@ -30,32 +24,32 @@ jobs:
       - uses: ./.github/workflows/setup_simc
         id: setup
 
-      - name: validate_simc
-        if: steps.setup.outputs.rebuilt-simc != 'true'
+      - name: validate_simc_pr
+        if: github.event_name == 'pull_request'
         run: |
-          if [[ "${{ steps.setup.outputs.rebuilt-simc }}" == "true" ]]; then
-            python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
-            ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-            --save .
-          fi
-          if [[ "${{ steps.setup.outputs.rebuilt-simc }}" != "true" ]]; then
-            find ${{ runner.workspace }}/simc-profile/profiles -type f \
-            | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
-            -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-            --save .
-          fi
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --save .
 
-      - name: execute_simc
+      - name: execute_simc_pr
+        if: github.event_name == 'pull_request'
+        run: |
+          python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --execute
+
+      - name: validate_simc_main
         if: github.event_name == 'push' && ( success() || failure() ) && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
         run: |
-          if [[ "${{ steps.setup.outputs.rebuilt-simc }}" == "true" ]]; then
-            python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
-            ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-            --execute
-          fi
-          if [[ "${{ steps.setup.outputs.rebuilt-simc }}" != "true" ]]; then
-            find ${{ runner.workspace }}/simc-profile/profiles -type f \
-            | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
-            -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-            --execute
-          fi
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --save .
+
+      - name: execute_simc_main
+        if: github.event_name == 'push' && ( success() || failure() ) && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --execute
