@@ -144,6 +144,8 @@ class Profile:
             print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
             return False
 
+        return True
+
     def expected_name(self):
         class_name, trailing_fragment, _ = self.path_parts()
         return f'{class_name}_{trailing_fragment}'
