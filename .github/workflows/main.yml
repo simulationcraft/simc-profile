@@ -16,11 +16,11 @@ jobs:
         run: |
           files=$(git diff --diff-filter=AM --no-commit-id --name-only HEAD~1 -- '***.simc' | xargs)
           echo $files
-          if [[ -n "$files" ]]; then
-            echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
-          else
-            exit 1
-          fi
+          # if [[ -n "$files" ]]; then
+          echo "MODIFIED_FILES=$files" >> $GITHUB_ENV
+          # else
+          #   exit 2
+          # fi
 
       - name: validate_python
         run: |
