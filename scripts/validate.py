@@ -62,7 +62,6 @@ for profile in args.filenames:
                     print(line)
                     success = False
 
-print(success)
 if success:
     exit(0)
 else:

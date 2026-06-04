@@ -35,7 +35,7 @@ def run_sim(binary: Path, profiles: list[str], prefix: list[str], suffix: list[s
 
 def print_dps_data(filename: Path):
     with subprocess.Popen(['jq', '[.sim.players[] | {name: .name, dps: .collected_data.dps}]', filename]) as proc:
-        return proc.return_code
+        return proc.returncode
 
 def save_profiles(binary: Path, profiles: list[Profile], location: Path):
     params = []
