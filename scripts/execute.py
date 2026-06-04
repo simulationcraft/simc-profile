@@ -31,13 +31,13 @@ def generate_simc_input(profiles: list[Profile]):
 
 def run_sim(binary: Path, profiles: list[str], prefix: list[str], suffix: list[str] = []):
     proc = subprocess.Popen([binary] + prefix + profiles + suffix, stdout=sys.stdout, stderr=sys.stderr)
-    rc = proc.communicate()
-    return rc
+    proc.wait()
+    return proc.returncode
 
 def print_dps_data(filename: Path):
     proc = subprocess.Popen(['jq', '[.sim.players[] | {name: .name, dps: .collected_data.dps}]', filename])
-    rc = proc.communicate()
-    return rc
+    proc.wait()
+    return proc.returncode
 
 def save_profiles(binary: Path, profiles: list[Profile], location: Path):
     params = []
@@ -72,4 +72,5 @@ if args.execute:
     rc.append(run_profiles(args.binary, args.filenames))
     rc.append(print_dps_data('/tmp/out.json'))
 
+print(rc)
 exit(max(rc))
