@@ -1,3 +1,9 @@
+# potion=lights_potential_2
+# flask=flask_of_the_magisters_2
+# food=queldorei_medley
+# augmentation=void_touched_augment_rune
+# temporary_enchant=main_hand:thalassian_phoenix_oil_2
+
 mage=mage_fire_frostfire
 spec=fire
 level=90
@@ -5,12 +11,6 @@ race=orc
 role=spell
 position=ranged_back
 talents=C8DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDZmZGAAAmZZGzMLzCEAAwiZmx2YmZGAAAAAgNzMzMDAAGzYmZmZmZ2AmZADzYMYwA
-
-potion=lights_potential_2
-flask=flask_of_the_magisters_2
-food=queldorei_medley
-augmentation=void_touched_augment_rune
-temporary_enchant=main_hand:thalassian_phoenix_oil_2
 
 head=voidbreakers_veil,id=250060,bonus_id=1808/12214/12667/13575/13575/13575/12497,ilevel=289,gem_id=240967,enchant_id=7991
 neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,gem_id=240892/240900

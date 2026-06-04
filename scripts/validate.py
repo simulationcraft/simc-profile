@@ -44,7 +44,6 @@ success = True
 
 for profile in args.filenames:
     if not profile.validate():
-        print(profile)
         success = False
     class_name, trailing_fragment, _ = profile.path_parts()
 
@@ -57,12 +56,10 @@ for profile in args.filenames:
             if line[0] == '#':
                 if header:
                     if not parse_header_option(line[1:].strip(), profile):
-                        print(line)
                         success = False
             else:
                 header = False
                 if not parse_simc_option(line, profile):
-                    print(line)
                     success = False
 
 if success:

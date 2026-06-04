@@ -10,7 +10,8 @@ def validate_header_option(line):
 def handle_header_line(line, deferral_list):
     option = ParsedOption(line)
     if option.validate(HEADER_OPTIONS):
-        if option.scope(HEADER_OPTIONS) == 'player':
+        option_definition = option.option(HEADER_OPTIONS)
+        if option_definition.scope == 'player' and option_definition.simc_option:
             deferral_list.append(line)
             return ''
         else:

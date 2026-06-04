@@ -1,5 +1,4 @@
 druid=druid_balance
-source=default
 spec=balance
 level=90
 race=night_elf

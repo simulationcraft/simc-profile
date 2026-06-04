@@ -25,13 +25,15 @@ class Option:
     values: list[str]
     case_sensitive: bool
     scope: str
+    simc_option: bool
 
-    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True, scope='player'):
+    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True, scope='player', simc_option = True):
         self.key = key
         self.values = values
         self.ignore_value = ignore_value
         self.case_sensitive = case_sensitive
         self.scope = scope
+        self.simc_option = simc_option
 
     def __eq__(self, other: ParsedOption):
         if isinstance(other, ParsedOption):
@@ -206,8 +208,8 @@ class ParsedOption:
             return f'Invalid Option {self.key}'
         return f'{self.key}{self.operator}{self.value}'
 
-    def scope(self, options: Options):
-        return next((o for o in options if o == self)).scope
+    def option(self, options: Options):
+        return next((o for o in options if o == self))
 
     def validate_class(self, profile: Profile):
         class_name, _, _ = profile.path_parts()

@@ -1,3 +1,9 @@
+# potion=lights_potential_2
+# flask=flask_of_thalassian_resistance_2
+# food=silvermoon_parade
+# augmentation=void_touched_augment_rune
+# temporary_enchant=main_hand:thalassian_phoenix_oil_2
+
 mage=mage_arcane_sunfury
 spec=arcane
 level=90
@@ -5,12 +11,6 @@ race=void_elf
 role=spell
 position=back
 talents=C4DAAAAAAAAAAAAAAAAAAAAAAYGmZZmZmFmZGamxAAAwAAmZmmlltZAgYDAgNmZmxYzyMzMLzMGjZmxYhZmZMDAwAAAMAzMgZAwwA
-
-potion=lights_potential_2
-flask=flask_of_thalassian_resistance_2
-food=silvermoon_parade
-augmentation=void_touched_augment_rune
-temporary_enchant=main_hand:thalassian_phoenix_oil_2
 
 head=voidbreakers_veil,id=250060,ilevel=289,bonus_id=13534,gem_id=240983,enchant_id=8017
 neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,bonus_id=13534,gem_id=240902/240902
