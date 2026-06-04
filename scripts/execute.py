@@ -30,19 +30,19 @@ def generate_simc_input(profiles: list[Profile]):
                     profile.params.append(line)
 
 def run_sim(binary: Path, profiles: list[str], prefix: list[str], suffix: list[str] = []):
-    with subprocess.Popen([binary] + prefix + profiles + suffix, stdout=sys.stdout, stderr=sys.stderr) as _:
-        pass
+    with subprocess.Popen([binary] + prefix + profiles + suffix, stdout=sys.stdout, stderr=sys.stderr) as proc:
+        return proc.returncode
 
 def print_dps_data(filename: Path):
-    with subprocess.Popen(['jq', '[.sim.players[] | {name: .name, dps: .collected_data.dps}]', filename]) as _:
-        pass
+    with subprocess.Popen(['jq', '[.sim.players[] | {name: .name, dps: .collected_data.dps}]', filename]) as proc:
+        return proc.return_code
 
 def save_profiles(binary: Path, profiles: list[Profile], location: Path):
     params = []
     for profile in profiles:
         params += profile.params
         params += [f'save={location}/{profile.expected_name()}.simc']
-    run_sim(binary, params, ['output=/dev/null'])
+    return run_sim(binary, params, ['output=/dev/null'])
 
 def run_profiles(binary: Path, profiles: list[Profile]):
     prefix = [
@@ -50,7 +50,7 @@ def run_profiles(binary: Path, profiles: list[Profile]):
         'target_error=0.05',
         'json=/tmp/out.json'
     ]
-    run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
+    return run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
 
 parser = ArgumentParser(prog='SimulationCraft Profile Runner')
 parser.add_argument('filenames', nargs='+', type=Profile)
@@ -62,9 +62,12 @@ args = parser.parse_args()
 
 generate_simc_input(args.filenames)
 
+rc = []
 if args.save:
-    save_profiles(args.binary, args.filenames, args.save)
+    rc.append(save_profiles(args.binary, args.filenames, args.save))
 
 if args.execute:
-    run_profiles(args.binary, args.filenames)
-    print_dps_data('/tmp/out.json')
+    rc.append(run_profiles(args.binary, args.filenames))
+    rc.append(print_dps_data('/tmp/out.json'))
+
+exit(max(rc))

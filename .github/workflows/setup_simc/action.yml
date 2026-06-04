@@ -1,5 +1,9 @@
 name: setup_simc
 
+outputs:
+  rebuilt-simc:
+    value: ${{ !steps.restore_cache.outputs.cache-hit }}
+
 runs:
   using: 'composite'
 

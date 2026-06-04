@@ -28,19 +28,34 @@ jobs:
           ${{ env.MODIFIED_FILES }}
 
       - uses: ./.github/workflows/setup_simc
-
-      - run: |
-          pwd
-          tree
+        id: setup
 
       - name: validate_simc
+        if: steps.setup.outputs.rebuilt-simc != 'true'
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
           --save /dev/null
 
+      - name: validate_simc
+        if: steps.setup.outputs.rebuilt-simc == 'true'
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --save /dev/null
+
       - name: execute_simc
+        if: steps.setup.outputs.rebuilt-simc != 'true'
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
+          ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
+          --execute
+
+      - name: execute_simc
+        if: steps.setup.outputs.rebuilt-simc == 'true'
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
           --execute

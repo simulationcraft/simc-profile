@@ -125,21 +125,24 @@ class Profile:
         # <class_name>=<class_name>_<spec_name><unnamed>
         if not self.path.exists():
             print(f'Path {self} does not exist.')
-            return
+            return False
 
         class_name, trailing_fragment, spec_name = self.path_parts()
+        if not class_name and not trailing_fragment and not spec_name:
+            return False
+
         if class_name not in SPEC_NAMES.keys():
             print(f'Profile {self} is not in a `profiles/<class>/` directory.')
-            return
+            return False
 
         if spec_name not in SPEC_NAMES[class_name]:
             print(f'Profile {self} does not contain a valid specialization name. It should include one of {", ".join(SPEC_NAMES[class_name])}.')
-            return
+            return False
 
         # python has no way to nicely test if a string contains only printable ascii characters :)
         if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
             print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
-            return
+            return False
 
     def expected_name(self):
         class_name, trailing_fragment, _ = self.path_parts()
@@ -149,7 +152,7 @@ class Profile:
         path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
         if path_parts[0] != 'profiles':
             print(f'Profile {self} is not in the `profiles/` directory.')
-            return
+            return False, False, False
 
         trailing_fragment = path_parts[2].split('.')[:-1][0]
         return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]

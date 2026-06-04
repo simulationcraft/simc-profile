@@ -27,8 +27,11 @@ parser.add_argument('filenames', nargs='+', type=Profile)
 
 args = parser.parse_args()
 
+success = True
+
 for profile in args.filenames:
-    profile.validate()
+    if not profile.validate():
+        success = False
     class_name, trailing_fragment, _ = profile.path_parts()
 
     with open(profile) as handle:
@@ -39,7 +42,14 @@ for profile in args.filenames:
                 continue
             if line[0] == '#':
                 if header:
-                    parse_header_option(line[1:].strip(), profile)
+                    if not parse_header_option(line[1:].strip(), profile):
+                        success = False
             else:
                 header = False
-                parse_simc_option(line, profile)
+                if not parse_simc_option(line, profile):
+                    success = False
+
+if success:
+    exit(0)
+else:
+    exit(1)
