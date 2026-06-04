@@ -1,7 +1,6 @@
-#fight_style=patchwerk
+#source=default
 
 monk=monk_brewmaster
-source=default
 spec=brewmaster
 level=90
 race=tauren
