@@ -71,7 +71,7 @@ if args.save:
 
 if args.execute:
     rc.append(run_profiles(args.binary, args.filenames))
-    rc.append(print_dps_data('/tmp/out.json'))
+    rc.append(print_dps_data('output.json'))
 
 print(rc)
 exit(max(rc))
