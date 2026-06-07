@@ -58,7 +58,9 @@ def print_dps_data(filename: Path):
     return proc.returncode
 
 def save_profiles(binary: Path, profiles: list[Profile], location: Path):
-    params = []
+    params = [
+        'single_actor_batch=1',
+    ]
     for profile in profiles:
         params += profile.params
         params += [f'save={location}/{profile.expected_name()}.simc']
@@ -66,6 +68,7 @@ def save_profiles(binary: Path, profiles: list[Profile], location: Path):
 
 def run_profiles(binary: Path, profiles: list[Profile]):
     prefix = [
+        'single_actor_batch=1',
         'output=/dev/null',
         'target_error=0.05',
         'json=output.json',
