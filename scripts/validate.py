@@ -106,6 +106,7 @@ def validate_seasonal(profile: Profile):
 
     success = True
 
+    print(f'\n\033[94m{profile}\033[0m')
     with open(profile) as handle:
         lines = handle.read()
         data = f'{{"text": "{lines.encode("unicode_escape").decode("utf-8")}"}}'.encode('utf-8')
@@ -125,12 +126,15 @@ def validate_seasonal(profile: Profile):
 
             if len(parsed_json.get('changes', [])):
                 print('Suggested Profile:')
-                print(parsed_json.get('input'))
+                modified = parsed_json.get('input').split('\n')
+                for line in modified:
+                    if not line.startswith('# normalized by Raidbots'):
+                        print(line)
 
             if any((len(parsed_json.get(entry, [])) for entry in fields)):
                 success = False
             else:
-                print(f'{profile} Ok! Raidbots Seasonal Configuration provided no suggestions.')
+                print(f'Ok! Raidbots Seasonal Configuration provided no suggestions.')
 
     return success
 
