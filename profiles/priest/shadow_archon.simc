@@ -6,18 +6,18 @@ role=spell
 position=ranged_back
 talents=CIQAAAAAAAAAAAAAAAAAAAAAAMMjZGAAAAAAAAAAAgxMMjxyMDzsNzwMsNzMmZmxGyMWMTDwMAzsZGmNDAZMWAwMQGzMzY2GzstMAzED
 
-head=blind_oaths_winged_crest,id=250051,bonus_id=13575/13575/13575/13575,ilevel=289,gem_id=240983,enchant_id=7961
-neck=eternal_voidsong_chain,id=249368,ilevel=289,gem_id=240892
-shoulders=blind_oaths_seraphguards,id=250049,bonus_id=13574/13574/13574/13574,ilevel=289,enchant_id=8031
+head=blind_oaths_winged_crest,id=250051,bonus_id=13575/13575/13575/13575/13668,ilevel=289,gem_id=240983,enchant_id=7961
+neck=eternal_voidsong_chain,id=249368,ilevel=289,gem_id=240892,bonus_id=13668
+shoulder=blind_oaths_seraphguards,id=250049,bonus_id=13574/13574/13574/13574,ilevel=289,enchant_id=8031
 back=draconic_nullcape,id=249370,ilevel=289
 chest=blind_oaths_raiment,id=250054,bonus_id=13575/13575/13575/13575,ilevel=289,enchant_id=7987
-wrists=martyrs_bindings,id=239648,ilevel=285,bonus_id=8793/12384,gem_id=240908
+wrist=martyrs_bindings,id=239648,ilevel=285,bonus_id=8793/12384/8960/13668,gem_id=240908
 hands=vilehex_bonds,id=251172,ilevel=289
-waist=arcanoweave_cord,id=239664,ilevel=285,gem_id=240900
+waist=arcanoweave_cord,id=239664,ilevel=285,gem_id=240900,bonus_id=13668
 legs=blind_oaths_leggings,id=250050,bonus_id=13575/13575/13575/13575,ilevel=289,enchant_id=7935
 feet=lightbinder_treads,id=109796,ilevel=289,enchant_id=7993
-finger1=occlusion_of_void,id=251217,ilevel=289,gem_id=240918,enchant_id=7969
-finger2=omission_of_light,id=251093,ilevel=289,gem_id=240900,enchant_id=7997
+finger1=occlusion_of_void,id=251217,ilevel=289,gem_id=240918,enchant_id=7969,bonus_id=13668
+finger2=omission_of_light,id=251093,ilevel=289,gem_id=240900,enchant_id=7997,bonus_id=13668
 trinket1=vaelgors_final_stare,id=249346,ilevel=289
 trinket2=gaze_of_the_alnseer,id=249343,bonus_id=12806/13577,ilevel=289
 main_hand=brazier_of_the_dissonant_dirge,id=249286,ilevel=289,enchant_id=8041

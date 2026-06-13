@@ -6,18 +6,18 @@ role=attack
 position=back
 talents=CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMzMDAAAghphxYmxyMzMzgxMDAAAAgZWmZAZMWWGYBMgZYCZGsBMjNz2YwMGgZGAmxwA
 
-head=night_enders_tusks,id=249952,bonus_id=12806/13335,gem_id=240983,enchant_id=7961
-neck=ribbon_of_coiled_malice,id=249337,bonus_id=12806/13335,gem_id=240906
-shoulders=night_enders_pauldrons,id=249950,bonus_id=12806/13335,enchant_id=8001
+head=night_enders_tusks,id=249952,bonus_id=12806/13335/13668,gem_id=240983,enchant_id=7961
+neck=ribbon_of_coiled_malice,id=249337,bonus_id=12806/13335/13668,gem_id=240906
+shoulder=night_enders_pauldrons,id=249950,bonus_id=12806/13335,enchant_id=8001
 back=adherents_silken_shroud,id=239656,bonus_id=8790/8960/12066/12384/13622/9627
 chest=night_enders_breastplate,id=249955,bonus_id=12806/13335,enchant_id=7987
-wrists=spellbreakers_bracers,id=237834,bonus_id=8790/8960/12066/12384/13622/9627,gem_id=240906
+wrist=spellbreakers_bracers,id=237834,bonus_id=8790/8960/12066/12384/13622/9627/13668,gem_id=240906
 hands=embergrove_grasps,id=251081,bonus_id=12806/13335
-waist=night_enders_girdle,id=249949,bonus_id=12806/13335,gem_id=240906
+waist=night_enders_girdle,id=249949,bonus_id=12806/13335/13668,gem_id=240906
 legs=night_enders_chausses,id=249951,bonus_id=12806/13335,enchant_id=8163
 feet=greaves_of_the_unformed,id=249381,bonus_id=12806/13335,enchant_id=7963
-finger1=eye_of_midnight,id=249920,bonus_id=12806/13335,gem_id=240906/240906,enchant_id=7967
-finger2=occlusion_of_void,id=251217,bonus_id=12806/13335,gem_id=240906,enchant_id=7967
+finger1=eye_of_midnight,id=249920,bonus_id=12806/13335/13668,gem_id=240906/240906,enchant_id=7967
+finger2=occlusion_of_void,id=251217,bonus_id=12806/13335/13668,gem_id=240906,enchant_id=7967
 trinket1=gaze_of_the_alnseer,id=249343,bonus_id=12806/13335
 trinket2=heart_of_ancient_hunger,id=249342,bonus_id=12806/13335
 main_hand=alahendal_the_dawnsong,id=249296,bonus_id=12806/13335,enchant_id=7983

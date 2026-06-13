@@ -9,9 +9,9 @@ talents=CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQzy2MzsMMzAAAAAAwoMmhZGbDz2wMbzYMmZYGLsNM
 head=,id=249961,bonus_id=1808,gem_id=240983,ilevel=289
 neck=,id=250247,bonus_id=1808,gem_id=240906/240906,ilevel=289
 shoulder=,id=249959,ilevel=289
-back=,id=239656,bonus_id=12384,crafted_stats=32/40,ilevel=285
+back=,id=239656,bonus_id=12384/8960,crafted_stats=32/40,ilevel=285
 chest=,id=249964,enchant_id=7987,ilevel=289
-wrist=,id=237834,bonus_id=12384/1808,gem_id=240906,crafted_stats=40/32,ilevel=285
+wrist=,id=237834,bonus_id=12384/1808/8960,gem_id=240906,crafted_stats=40/32,ilevel=285
 hands=,id=151332,ilevel=289
 waist=,id=249380,bonus_id=1808,gem_id=240906,ilevel=289
 legs=,id=249960,enchant_id=8159,ilevel=289

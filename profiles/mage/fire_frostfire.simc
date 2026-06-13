@@ -13,7 +13,7 @@ position=ranged_back
 talents=C8DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDZmZGAAAmZZGzMLzCEAAwiZmx2YmZGAAAAAgNzMzMDAAGzYmZmZmZ2AmZADzYMYwA
 
 head=voidbreakers_veil,id=250060,bonus_id=1808/12214/12667/13575/13575/13575/12497,ilevel=289,gem_id=240967,enchant_id=7991
-neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,gem_id=240892/240900
+neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,gem_id=240892/240900,bonus_id=13668
 shoulder=voidbreakers_leyline_nexi,id=250058,bonus_id=40/12675/12806/13335/13340/13574/13574/13574,ilevel=289,enchant_id=7973
 back=adherents_silken_shroud,id=239656,bonus_id=8793/8960/12214/12384,ilevel=285,crafted_stats=36/32
 chest=robes_of_endless_oblivion,id=249912,bonus_id=40/12676/12806/13335/13336,ilevel=289,enchant_id=7987
@@ -22,8 +22,8 @@ hands=voidbreakers_gloves,id=250061,bonus_id=40/12675/12806/13335/13337/13574/13
 waist=whisperinscribed_sash,id=249376,bonus_id=1808,ilevel=289,gem_id=240900
 legs=voidbreakers_britches,id=250059,bonus_id=40/12676/12806/13335/13339/13575/13575/13575,ilevel=289,enchant_id=7935
 feet=voidbreakers_treads,id=250062,bonus_id=40/12806/13335,ilevel=289,enchant_id=8019
-finger1=eye_of_midnight,id=249920,ilevel=289,gem_id=240906/240900,enchant_id=7967
-finger2=bond_of_light,id=249369,ilevel=289,gem_id=240916,enchant_id=7967
+finger1=eye_of_midnight,id=249920,ilevel=289,gem_id=240906/240900,enchant_id=7967,bonus_id=13668
+finger2=bond_of_light,id=249369,ilevel=289,gem_id=240916,enchant_id=7967,bonus_id=13668
 trinket1=emberwing_feather,id=250144,bonus_id=40/12806/13440,ilevel=298
 trinket2=gaze_of_the_alnseer,id=249343,bonus_id=40/12806/13335,ilevel=298
 main_hand=brazier_of_the_dissonant_dirge,id=249286,bonus_id=12792/13448/13452,ilevel=298,enchant_id=8039

@@ -8,12 +8,12 @@ talents=CgcBAAAAAAAAAAAAAAAAAAAAAAA2MmZmZmZmxwMAAAAAAAegxsNYGAAAAAAAAmxMMmZmZMzM
 
 head=devouring_reavers_intake,id=250033,bonus_id=1808/13575/13575/13575/13575/13575/13575,ilevel=289,gem_id=240983
 neck=eternal_voidsong_chain,id=249368,bonus_id=13534,ilevel=289,gem_id=240908
-shoulders=devouring_reavers_exhaustplates,id=250031,bonus_id=13574/13574/13574/13574/13574/13574,ilevel=289
+shoulder=devouring_reavers_exhaustplates,id=250031,bonus_id=13574/13574/13574/13574/13574/13574,ilevel=289
 back=draconic_nullcape,id=249370,ilevel=289
 chest=devouring_reavers_engine,id=250036,bonus_id=13575/13575/13575/13575/13575/13575,ilevel=289,enchant_id=7987
-wrists=frenzyroot_cuffs,id=193714,bonus_id=1808/12806/13577,gem_id=240908
+wrist=frenzyroot_cuffs,id=193714,bonus_id=1808/12806/13577,gem_id=240908
 hands=devouring_reavers_essence_grips,id=250034,bonus_id=13574/13574/13574/13574/13574/13574,ilevel=289
-waist=silvermoon_agents_utility_belt,id=244573,bonus_id=8790/8960/12214/12384,ilevel=285,gem_id=240900,crafted_stats=49/36
+waist=silvermoon_agents_utility_belt,id=244573,bonus_id=8790/8960/12214/12384/13668,ilevel=285,gem_id=240900,crafted_stats=49/36
 legs=legwraps_of_lingering_legacies,id=251087,ilevel=289,enchant_id=7935
 feet=devouring_reavers_soul_flatteners,id=250035,ilevel=289,enchant_id=7963
 finger1=bond_of_light,id=249369,bonus_id=13534,ilevel=289,gem_id=240908,enchant_id=7967
