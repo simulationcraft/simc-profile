@@ -20,13 +20,25 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/validate.py \
-          ${{ env.MODIFIED_FILES }}
+          ${{ env.MODIFIED_FILES }} --validate
 
       - name: validate_python_main
         if: github.event_name == 'push' && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
         run: |
           find ${{ runner.workspace }}/simc-profile/profiles -type f \
-          | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py --validate
+
+      - name: validate_seasonal_python_pr
+        if: github.event_name == 'pull_request'
+        run: |
+          python ${{ runner.workspace }}/simc-profile/scripts/validate.py \
+          ${{ env.MODIFIED_FILES }} --validate-seasonal
+
+      - name: validate_seasonal_python_main
+        if: github.event_name == 'push' && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
+        run: |
+          find ${{ runner.workspace }}/simc-profile/profiles -type f \
+          | xargs python ${{ runner.workspace }}/simc-profile/scripts/validate.py --validate-seasonal
 
       - uses: ./.github/workflows/setup_simc
         id: setup

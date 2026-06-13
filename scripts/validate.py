@@ -1,4 +1,9 @@
 from argparse import ArgumentParser
+from dataclasses import dataclass
+from difflib import ndiff
+from json import loads
+from urllib.request import Request, urlopen
+
 from shared import ParsedOption, Profile, HEADER_OPTIONS, SIMC_OPTIONS
 
 def parse_header_option(line, profile):
@@ -32,21 +37,13 @@ def parse_simc_option(line, profile):
 
     return True
 
-parser = ArgumentParser(prog='SimulationCraft Profile Validator')
-parser.add_argument('filenames', nargs='*', type=Profile)
+def validate(profile: Profile):
+    success = True
 
-args = parser.parse_args()
-
-if not len(args.filenames):
-    exit(0)
-
-success = True
-
-for profile in args.filenames:
     if not profile.validate():
         success = False
-    class_name, trailing_fragment, _ = profile.path_parts()
 
+    class_name, trailing_fragment, _ = profile.path_parts()
     with open(profile) as handle:
         header = True
         for line in handle.readlines():
@@ -61,6 +58,100 @@ for profile in args.filenames:
                 header = False
                 if not parse_simc_option(line, profile):
                     success = False
+    return success
+
+@dataclass
+class Change:
+    description: str
+    line: int
+    old: str
+    new: str
+
+    def diff(self):
+        def color_line(line: str):
+            if line[0] == '-':
+                return '\033[31m' + line + '\033[0m'
+            if line[0] == '+':
+                return '\033[92m' + line + '\033[0m'
+            return line
+
+        lines = []
+        diff = ndiff(self.old.split(), self.new.split())
+        for line in diff:
+            line = line.rstrip()
+            if line[0] == '?':
+                line = f' {line[1:]}'
+            if line[0] in '+-':
+                lines.append(line)
+            else:
+                lines[-1] += f'\n{line}'
+        return '\n'.join((
+            color_line(L) for L in lines
+        ))
+
+def validate_seasonal(profile: Profile):
+    def print_entries(entry_type, entries):
+        if not len(entries):
+            return
+
+        print(f'{entry_type}:')
+        for entry in entries:
+            if entry_type == 'changes':
+                change = Change(*entry.values())
+                print(f'  {change.description}')
+                print(change.diff())
+            else:
+                print(f'  {entry}')
+        print()
+
+    success = True
+
+    with open(profile) as handle:
+        lines = handle.read()
+        data = f'{{"text": "{lines.encode("unicode_escape").decode("utf-8")}"}}'.encode('utf-8')
+        request = Request('https://www.raidbots.com/api/simc/input/normalize',
+                          data=data,
+                          headers={'Content-Type': 'application/json',
+                                   'User-Agent': 'simc-profile'},
+                          method='POST')
+
+        with urlopen(request) as response:
+            body = response.read()
+            encoding = response.info().get_content_charset('utf-8')
+            parsed_json = loads(body.decode(encoding))
+
+            fields = ('warnings', 'ignoredOptions', 'invalidCommands', 'changes')
+            [print_entries(entry, parsed_json.get(entry)) for entry in fields]
+
+            if len(parsed_json.get('changes', [])):
+                print('Suggested Profile:')
+                print(parsed_json.get('input'))
+
+            if any((len(parsed_json.get(entry, [])) for entry in fields)):
+                success = False
+            else:
+                print(f'{profile} Ok! Raidbots Seasonal Configuration provided no suggestions.')
+
+    return success
+
+parser = ArgumentParser(prog='SimulationCraft Profile Validator')
+parser.add_argument('filenames', nargs='*', type=Profile)
+parser.add_argument('--validate', action='store_true', default=False, help='validate profiles')
+parser.add_argument('--validate-seasonal', action='store_true', default=False)
+
+args = parser.parse_args()
+
+if not len(args.filenames):
+    exit(0)
+
+success = True
+
+for profile in args.filenames:
+    if args.validate:
+        success &= validate(profile)
+
+    if args.validate_seasonal:
+        success &= validate_seasonal(profile)
 
 if success:
     exit(0)
