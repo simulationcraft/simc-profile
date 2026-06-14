@@ -6,8 +6,8 @@ from urllib.request import Request, urlopen
 
 from shared import ParsedOption, Profile, HEADER_OPTIONS, SIMC_OPTIONS
 
-def parse_header_option(line, profile):
-    option = ParsedOption(line)
+def parse_header_option(line: str, profile: Profile):
+    option = ParsedOption(line, profile)
 
     # only validate header options if they look like they could be options
     if option.validate_key(HEADER_OPTIONS) and not option.validate_value(HEADER_OPTIONS):
@@ -16,14 +16,8 @@ def parse_header_option(line, profile):
 
     return True
 
-def parse_simc_option(line, profile):
-    option = ParsedOption(line)
-    if option.validate_class(profile):
-        if not option.validate_class_value(profile):
-            print(f'Profile {profile} has invalid name {option}. Expected {profile.expected_name()}.')
-            return False
-        return True
-
+def parse_simc_option(line: str, profile: Profile):
+    option = ParsedOption(line, profile)
     if not option.validate_key(SIMC_OPTIONS):
         print(f'Profile {profile} has invalid Profile option {option.key}.', end='')
         if option.validate_key(HEADER_OPTIONS):
@@ -60,36 +54,36 @@ def validate(profile: Profile):
                     success = False
     return success
 
-@dataclass
-class Change:
-    description: str
-    line: int
-    old: str
-    new: str
-
-    def diff(self):
-        def color_line(line: str):
-            if line[0] == '-':
-                return '\033[31m' + line + '\033[0m'
-            if line[0] == '+':
-                return '\033[92m' + line + '\033[0m'
-            return line
-
-        lines = []
-        diff = ndiff(self.old.split(), self.new.split())
-        for line in diff:
-            line = line.rstrip()
-            if line[0] == '?':
-                line = f' {line[1:]}'
-            if line[0] in '+-':
-                lines.append(line)
-            else:
-                lines[-1] += f'\n{line}'
-        return '\n'.join((
-            color_line(L) for L in lines
-        ))
-
 def validate_seasonal(profile: Profile):
+    @dataclass
+    class Change:
+        description: str
+        line: int
+        old: str
+        new: str
+
+        def diff(self):
+            def color_line(line: str):
+                if line[0] == '-':
+                    return '\033[31m' + line + '\033[0m'
+                if line[0] == '+':
+                    return '\033[92m' + line + '\033[0m'
+                return line
+
+            lines = []
+            diff = ndiff(self.old.split(), self.new.split())
+            for line in diff:
+                line = line.rstrip()
+                if line[0] == '?':
+                    line = f' {line[1:]}'
+                if line[0] in '+-':
+                    lines.append(line)
+                else:
+                    lines[-1] += f'\n{line}'
+            return '\n'.join((
+                color_line(L) for L in lines
+            ))
+
     def print_entries(entry_type, entries):
         if not len(entries):
             return
@@ -103,8 +97,6 @@ def validate_seasonal(profile: Profile):
             else:
                 print(f'  {entry}')
         print()
-
-    success = True
 
     print(f'\n\033[94m{profile}\033[0m')
     with open(profile) as handle:
@@ -132,11 +124,11 @@ def validate_seasonal(profile: Profile):
                         print(line)
 
             if any((len(parsed_json.get(entry, [])) for entry in fields)):
-                success = False
+                return False
             else:
-                print(f'Ok! Raidbots Seasonal Configuration provided no suggestions.')
+                print('Ok! Raidbots Seasonal Configuration provided no suggestions.')
 
-    return success
+    return True
 
 parser = ArgumentParser(prog='SimulationCraft Profile Validator')
 parser.add_argument('filenames', nargs='*', type=Profile)
@@ -153,7 +145,6 @@ success = True
 for profile in args.filenames:
     if args.validate:
         success &= validate(profile)
-
     if args.validate_seasonal:
         success &= validate_seasonal(profile)
 

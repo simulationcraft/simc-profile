@@ -1,4 +1,13 @@
 from pathlib import Path, PurePath
+from collections.abc import Callable, Iterable
+
+def flatten(collection: Iterable):
+    for element in collection:
+        if isinstance(element, Iterable) and not isinstance(element, str):
+            for subelement in flatten(element):
+                yield subelement
+        else:
+            yield element
 
 SPEC_NAMES = {
     'deathknight': ['blood', 'frost', 'unholy'],
@@ -26,19 +35,28 @@ class Option:
     case_sensitive: bool
     scope: str
     simc_option: bool
+    validate_fn: Callable[[ParsedOption], bool] | None
 
-    def __init__(self, key, values=[], ignore_value=False, case_sensitive=True, scope='player', simc_option = True):
+    def __init__(self, key, values=None, case_sensitive=True, scope=None, simc_option=True, validate_fn=None):
+        assert scope is not None
         self.key = key
-        self.values = values
-        self.ignore_value = ignore_value
+        self.values = values if values is not None else []
+        self.ignore_value = True if values is None else False
         self.case_sensitive = case_sensitive
         self.scope = scope
         self.simc_option = simc_option
+        self.validate_fn = validate_fn
 
     def __eq__(self, other: ParsedOption):
         if isinstance(other, ParsedOption):
-            if self.key != other.key:
-                return False
+            if isinstance(self.key, str):
+                if self.key != other.key:
+                    return False
+            if isinstance(self.key, list):
+                if other.key not in self.key:
+                    return False
+            if self.validate_fn is not None:
+                return self.validate_fn(other)
             if self.ignore_value:
                 return True
             if self.case_sensitive:
@@ -54,7 +72,7 @@ class Options:
 
     def __init__(self, *options):
         self.options = options
-        self.keys = set((o.key for o in options))
+        self.keys = set(flatten((option.key for option in options)))
 
     def __contains__(self, other):
         return other in self.options
@@ -63,58 +81,73 @@ class Options:
         for option in self.options:
             yield option
 
-# class (handled separately as value depends on filename)
+def validate_class_option(option: ParsedOption):
+    success = option.value == option.profile.expected_name()
+    if not success:
+        print(f'Profile {option.profile} has invalid name {option}. Expected {option.profile.expected_name()}.')
+    return success
+
 SIMC_OPTIONS = Options(
-    Option('level', ['90']),
-    Option('spec', [spec for specs in SPEC_NAMES.values() for spec in specs]),
+    Option(list(SPEC_NAMES.keys()), validate_fn=validate_class_option, scope='sim'),
+    Option('level', ['90'], scope='player'),
+    Option('spec', [spec for specs in SPEC_NAMES.values() for spec in specs], scope='player'),
     # copied from util::race_type_string and util::parse_race_type
     Option('race',
            ['blood_elf', 'dark_iron_dwarf', 'dracthyr_alliance', 'dracthyr_horde', 'draenei', 'dwarf', 'gnome', 'goblin', 'haranir_alliance', 'haranir_horde', 'highmountain_tauren', 'human', 'kul_tiran', 'lightforged_draenei', 'maghar_orc', 'mechagnome', 'night_elf', 'nightborne', 'orc', 'pandaren', 'pandaren_alliance', 'pandaren_horde', 'tauren', 'troll', 'undead', 'void_elf', 'vulpera', 'worgen', 'zandalari_troll', 'forsaken', 'dracthyr', 'earthen', 'earthen_dwarf', 'haranir', 'harronir', 'harronir_horde', 'harronir_alliance'],
-           case_sensitive=False),
-    Option('timeofday', ['day', 'daytime', 'night', 'nighttime']),
+           case_sensitive=False,
+           scope='player'),
+    Option('timeofday', ['day', 'daytime', 'night', 'nighttime'], scope='player'),
     # copied from util::role_type_string
-    Option('role', ['attack', 'spell', 'hybrid', 'dps', 'tank', 'heal', 'auto']),
+    Option('role', ['attack', 'spell', 'hybrid', 'dps', 'tank', 'heal', 'auto'], scope='player'),
     # copied from util::position_type_string
-    Option('position', ['none', 'back', 'front', 'ranged_back', 'ranged_front']),
+    Option('position', ['none', 'back', 'front', 'ranged_back', 'ranged_front'], scope='player'),
     # talents
-    Option('talents', ignore_value=True),
+    Option('talents', scope='player'),
     # gear
-    Option('head', ignore_value=True),
-    Option('neck', ignore_value=True),
-    Option('shoulders', ignore_value=True),
-    Option('shoulder', ignore_value=True),
-    Option('chest', ignore_value=True),
-    Option('waist', ignore_value=True),
-    Option('legs', ignore_value=True),
-    Option('leg', ignore_value=True),
-    Option('feet', ignore_value=True),
-    Option('foot', ignore_value=True),
-    Option('wrists', ignore_value=True),
-    Option('wrist', ignore_value=True),
-    Option('hands', ignore_value=True),
-    Option('hand', ignore_value=True),
-    Option('finger1', ignore_value=True),
-    Option('finger2', ignore_value=True),
-    Option('ring1', ignore_value=True),
-    Option('ring2', ignore_value=True),
-    Option('trinket1', ignore_value=True),
-    Option('trinket2', ignore_value=True),
-    Option('back', ignore_value=True),
-    Option('main_hand', ignore_value=True),
-    Option('off_hand', ignore_value=True),
+    Option('head', scope='player'),
+    Option('neck', scope='player'),
+    Option('shoulders', scope='player'),
+    Option('shoulder', scope='player'),
+    Option('chest', scope='player'),
+    Option('waist', scope='player'),
+    Option('legs', scope='player'),
+    Option('leg', scope='player'),
+    Option('feet', scope='player'),
+    Option('foot', scope='player'),
+    Option('wrists', scope='player'),
+    Option('wrist', scope='player'),
+    Option('hands', scope='player'),
+    Option('hand', scope='player'),
+    Option('finger1', scope='player'),
+    Option('finger2', scope='player'),
+    Option('ring1', scope='player'),
+    Option('ring2', scope='player'),
+    Option('trinket1', scope='player'),
+    Option('trinket2', scope='player'),
+    Option('back', scope='player'),
+    Option('main_hand', scope='player'),
+    Option('off_hand', scope='player'),
+    # consumables
+    Option('potion', scope='player'),
+    Option('flask', scope='player'),
+    Option('food', scope='player'),
+    Option('augmentation', scope='player'),
+    Option('temporary_enchant', scope='player'),
     # class options
     # copied from warlock_t::create_action_warlock
-    Option('warlock.default_pet', ['sayaad', 'succubus', 'incubus', 'felguard']),
+    Option('warlock.default_pet', ['sayaad', 'succubus', 'incubus', 'felguard'], scope='player'),
 )
+
 HEADER_OPTIONS = Options(
-    Option('desired_targets', ignore_value=True, scope='sim'),
+    Option('desired_targets', scope='sim'),
     Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
     Option('source', ['default'], scope='player'),
-    Option('potion', ignore_value=True, scope='player'),
-    Option('flask', ignore_value=True, scope='player'),
-    Option('food', ignore_value=True, scope='player'),
-    Option('augmentation', ignore_value=True, scope='player'),
-    Option('temporary_enchant', ignore_value=True, scope='player'),
+    # consumables
+    Option('potion', scope='player'),
+    Option('flask', scope='player'),
+    Option('food', scope='player'),
+    Option('augmentation', scope='player'),
+    Option('temporary_enchant', scope='player'),
 )
 
 class Profile:
@@ -171,13 +204,17 @@ class Profile:
         return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
 
 class ParsedOption:
+    profile: Profile
+
     key: str
     operator: str
     value: str
 
     parsed: bool
 
-    def __init__(self, line):
+    def __init__(self, line: str, profile: Profile):
+        self.profile = profile
+
         self.parsed = True
         try:
             collect_key = ""
@@ -210,13 +247,6 @@ class ParsedOption:
 
     def option(self, options: Options):
         return next((o for o in options if o == self))
-
-    def validate_class(self, profile: Profile):
-        class_name, _, _ = profile.path_parts()
-        return self.parsed and self.key == class_name
-
-    def validate_class_value(self, profile: Profile):
-        return self.parsed and self.validate_class(profile) and self.value == profile.expected_name()
 
     def validate(self, options: Options):
         return self.parsed and self.validate_key(options) and self.validate_value(options)

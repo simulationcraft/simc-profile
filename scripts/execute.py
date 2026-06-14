@@ -2,13 +2,10 @@ from argparse import ArgumentParser
 from pathlib import Path
 import sys
 import subprocess
-from shared import ParsedOption, Profile, HEADER_OPTIONS
+from shared import ParsedOption, Profile, Options, HEADER_OPTIONS, SIMC_OPTIONS, SPEC_NAMES
 
-def validate_header_option(line):
-    return ParsedOption(line).validate(HEADER_OPTIONS)
-
-def handle_header_line(line, deferral_list):
-    option = ParsedOption(line)
+def handle_header_line(line: str, deferral_list: Options, profile: Profile):
+    option = ParsedOption(line, profile)
     if option.validate(HEADER_OPTIONS):
         option_definition = option.option(HEADER_OPTIONS)
         if option_definition.scope == 'player' and option_definition.simc_option:
@@ -32,12 +29,12 @@ def generate_simc_input(profiles: list[Profile]):
                 if not len(line):
                     continue
                 if line[0] == '#' and header:
-                    line = handle_header_line(line[1:].strip(), deferred_options)
+                    line = handle_header_line(line[1:].strip(), deferred_options, profile)
                 elif line[0] == '#' and not header:
                     line = ''
                 else:
-                    option = ParsedOption(line)
-                    if option.validate_class(profile) and option.validate_class_value(profile):
+                    option = ParsedOption(line, profile)
+                    if option.key in SPEC_NAMES.keys() and option.validate(SIMC_OPTIONS):
                         push_deferred_options = True
                     header = False
 
@@ -66,13 +63,13 @@ def save_profiles(binary: Path, profiles: list[Profile], location: Path):
         params += [f'save={location}/{profile.expected_name()}.simc']
     return run_sim(binary, params, ['output=/dev/null'])
 
-def run_profiles(binary: Path, profiles: list[Profile]):
+def run_profiles(binary: Path, profiles: list[Profile], location: Path):
     prefix = [
         'single_actor_batch=1',
         'output=/dev/null',
         'target_error=0.05',
-        'json=output.json',
-        'html=output.html'
+        f'json={location}/output.json',
+        f'html={location}/output.html'
     ]
     return run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
 
@@ -80,7 +77,7 @@ parser = ArgumentParser(prog='SimulationCraft Profile Runner')
 parser.add_argument('filenames', nargs='*', type=Profile)
 parser.add_argument('-b', '--binary', type=Path, required=True, metavar='PATH')
 parser.add_argument('--save', type=Path, default=False, metavar='PATH', help='root directory to save all profiles')
-parser.add_argument('--execute', action='store_true', default=False, help='execute profiles')
+parser.add_argument('--execute', type=Path, default=False, metavar='PATH', help='root directory to save profile output')
 
 args = parser.parse_args()
 
@@ -94,8 +91,8 @@ if args.save:
     rc.append(save_profiles(args.binary, args.filenames, args.save))
 
 if args.execute:
-    rc.append(run_profiles(args.binary, args.filenames))
-    rc.append(print_dps_data('output.json'))
+    rc.append(run_profiles(args.binary, args.filenames, args.execute))
+    rc.append(print_dps_data(f'{args.execute}/output.json'))
 
 print(rc)
 exit(max(rc))

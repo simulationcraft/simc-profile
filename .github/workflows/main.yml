@@ -55,7 +55,7 @@ jobs:
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-          --execute
+          --execute .
 
       - name: validate_simc_main
         if: github.event_name == 'push' && github.repository == 'simulationcraft/simc-profile' && github.ref_name == github.event.repository.default_branch
@@ -71,4 +71,4 @@ jobs:
           find ${{ runner.workspace }}/simc-profile/profiles -type f \
           | xargs python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
-          --execute
+          --execute .
