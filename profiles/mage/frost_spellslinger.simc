@@ -1,9 +1,3 @@
-# potion=potion_of_recklessness_2
-# flask=flask_of_the_shattered_sun_2
-# food=harandar_celebration
-# augmentation=void_touched_augment_rune
-# temporary_enchant=main_hand:thalassian_phoenix_oil_2
-
 mage=mage_frost_spellslinger
 spec=frost
 level=90
@@ -11,6 +5,12 @@ race=pandaren
 role=spell
 position=ranged_back
 talents=CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMmZmYmZmZMjZWMzMzMjZAAAgZmZWWmZaDAAAAAAsBw2yYmZGMLzDYMDLAAAMzCwMhBMDGA
+
+potion=potion_of_recklessness_2
+flask=flask_of_the_shattered_sun_2
+food=harandar_celebration
+augmentation=void_touched
+temporary_enchant=main_hand:thalassian_phoenix_oil_2
 
 head=voidbreakers_veil,id=250060,bonus_id=1808/13575,ilevel=289,gem_id=240983
 neck=amulet_of_the_abyssal_hymn,id=250247,bonus_id=12806/13577/13668,gem_id=240908/240908

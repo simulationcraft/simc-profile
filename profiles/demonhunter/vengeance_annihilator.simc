@@ -1,9 +1,3 @@
-# flask=flask_of_the_magisters_2
-# potion=lights_potential_2
-# food=silvermoon_parade
-# augmentation=void_touched
-# temporary_enchant=main_hand:thalassian_phoenix_oil_2/off_hand:thalassian_phoenix_oil_2
-
 demonhunter=demonhunter_vengeance_annihilator
 level=90
 race=night_elf
@@ -11,6 +5,12 @@ spec=vengeance
 role=tank
 position=front
 talents=CUkAAAAAAAAAAAAAAAAAAAAAAAAYMzMjhZkZmZGDzMzMDGzMmxMmhxMmZsMmZZMmBAAAAAAAgZmxGAAAAGYmZmZ2abmZGAYAAAAMA
+
+flask=flask_of_the_magisters_2
+potion=lights_potential_2
+food=silvermoon_parade
+augmentation=void_touched
+temporary_enchant=main_hand:thalassian_phoenix_oil_2/off_hand:thalassian_phoenix_oil_2
 
 head=devouring_reavers_intake,id=250033,ilevel=289,gem_id=240983,enchant_id=7961,bonus_id=13668
 neck=eternal_voidsong_chain,id=249368,ilevel=289,gem_id=240858,bonus_id=13668
