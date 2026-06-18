@@ -142,12 +142,6 @@ HEADER_OPTIONS = Options(
     Option('desired_targets', scope='sim'),
     Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
     Option('source', ['default'], scope='player'),
-    # consumables
-    Option('potion', scope='player'),
-    Option('flask', scope='player'),
-    Option('food', scope='player'),
-    Option('augmentation', scope='player'),
-    Option('temporary_enchant', scope='player'),
 )
 
 class Profile:
