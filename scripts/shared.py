@@ -182,8 +182,8 @@ class Profile:
             print(f'Path {self} does not exist.')
             return False
 
-        class_name, trailing_fragment, spec_name = self.path_parts()
-        if not class_name and not trailing_fragment and not spec_name:
+        class_name, spec_name, suffix = self.path_parts()
+        if not class_name or not spec_name:
             return False
 
         if class_name not in SPEC_NAMES.keys():
@@ -195,15 +195,15 @@ class Profile:
             return False
 
         # python has no way to nicely test if a string contains only printable ascii characters :)
-        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
-            print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
+        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in suffix)):
+            print(f'Profile {self} suffix {suffix} is not alphanumeric.')
             return False
 
         return True
 
     def expected_name(self):
-        class_name, trailing_fragment, _ = self.path_parts()
-        return f'{class_name}_{trailing_fragment}'
+        class_name, spec_name, suffix = self.path_parts()
+        return f'{class_name}_{spec_name}{"" if suffix == "" else "_"}{suffix}'
 
     def path_parts(self):
         path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
@@ -212,7 +212,12 @@ class Profile:
             return False, False, False
 
         trailing_fragment = path_parts[2].split('.')[:-1][0]
-        return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
+        spec_name = trailing_fragment.split('_')[0]
+        suffix = '_'.join(trailing_fragment.split('_')[1:])
+        return path_parts[1], spec_name, suffix
+
+    def related_profiles(self):
+        return self.path.parent.glob(f'{self.path_parts()[1]}*.simc')
 
 class ParsedOption:
     profile: Profile
