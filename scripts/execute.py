@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 from pathlib import Path
-import sys
 import subprocess
+import sys
+
 from shared import ParsedOption, Profile, Options, HEADER_OPTIONS, SIMC_OPTIONS, SPEC_NAMES
 
 def handle_header_line(line: str, deferral_list: Options, profile: Profile):

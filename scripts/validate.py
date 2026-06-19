@@ -14,6 +14,7 @@ def parse_header_option(line: str, profile: Profile):
         print(f'Profile {profile} has invalid Header option {option}.')
         return False
 
+    profile.observed_options.add(option.option(HEADER_OPTIONS))
     return True
 
 def parse_simc_option(line: str, profile: Profile):
@@ -29,6 +30,7 @@ def parse_simc_option(line: str, profile: Profile):
         print(f'Profile {profile} has invalid Profile option {option}.')
         return False
 
+    profile.observed_options.add(option.option(SIMC_OPTIONS))
     return True
 
 def validate(profile: Profile):
@@ -52,7 +54,11 @@ def validate(profile: Profile):
                 header = False
                 if not parse_simc_option(line, profile):
                     success = False
-    return success
+
+    missing_options = (SIMC_OPTIONS.required | HEADER_OPTIONS.required) - profile.observed_options
+    for option in missing_options:
+        print(f'Profile {profile} is missing {option}.')
+    return success and len(missing_options) == 0
 
 def validate_seasonal(profile: Profile):
     @dataclass
