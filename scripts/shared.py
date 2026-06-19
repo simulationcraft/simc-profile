@@ -29,23 +29,39 @@ class ParsedOption:
     pass
 
 class Option:
-    key: str
+    key: str | list[str]
+    alias: str
     ignore_value: bool
     values: list[str]
     case_sensitive: bool
     scope: str
     simc_option: bool
     validate_fn: Callable[[ParsedOption], bool] | None
+    required: bool
+    unique_value: bool
 
-    def __init__(self, key, values=None, case_sensitive=True, scope=None, simc_option=True, validate_fn=None):
-        assert scope is not None
+    def __init__(self, key, values=None,
+                 case_sensitive=True, scope=None, simc_option=True,
+                 validate_fn=None, required=False, unique_value=False,
+                 alias=None):
+        if scope is None:
+            print(key, values)
+            assert scope is not None
         self.key = key
+        self.alias = alias
         self.values = values if values is not None else []
         self.ignore_value = True if values is None else False
         self.case_sensitive = case_sensitive
         self.scope = scope
         self.simc_option = simc_option
         self.validate_fn = validate_fn
+        self.required = required
+        self.unique_value = unique_value
+
+    def __str__(self):
+        return f"{self.scope} option " \
+            f"'{self.key if self.alias is None else self.alias}'" \
+            f"{'' if self.ignore_value else f' (possible value{'s' if len(self.values) > 1 else ''}: {', '.join(self.values)})'}"
 
     def __eq__(self, other: ParsedOption):
         if isinstance(other, ParsedOption):
@@ -66,13 +82,20 @@ class Option:
         assert False
         return False
 
+    def __hash__(self):
+        return hash((repr(self.key), self.ignore_value, repr(self.values),
+                     self.case_sensitive, self.scope, self.simc_option,
+                     self.validate_fn, self.required, self.unique_value))
+
 class Options:
     options: list[Option]
     keys: set()
+    required: set()
 
     def __init__(self, *options):
         self.options = options
         self.keys = set(flatten((option.key for option in options)))
+        self.required = set(option for option in options if option.required)
 
     def __contains__(self, other):
         return other in self.options
@@ -88,44 +111,36 @@ def validate_class_option(option: ParsedOption):
     return success
 
 SIMC_OPTIONS = Options(
-    Option(list(SPEC_NAMES.keys()), validate_fn=validate_class_option, scope='sim'),
-    Option('level', ['90'], scope='player'),
-    Option('spec', [spec for specs in SPEC_NAMES.values() for spec in specs], scope='player'),
+    Option(list(SPEC_NAMES.keys()), alias='<class name>', validate_fn=validate_class_option, scope='sim', required=True),
+    Option('level', ['90'], scope='player', required=True),
+    Option('spec', [spec for specs in SPEC_NAMES.values() for spec in specs], scope='player', required=True),
     # copied from util::race_type_string and util::parse_race_type
     Option('race',
            ['blood_elf', 'dark_iron_dwarf', 'dracthyr_alliance', 'dracthyr_horde', 'draenei', 'dwarf', 'gnome', 'goblin', 'haranir_alliance', 'haranir_horde', 'highmountain_tauren', 'human', 'kul_tiran', 'lightforged_draenei', 'maghar_orc', 'mechagnome', 'night_elf', 'nightborne', 'orc', 'pandaren', 'pandaren_alliance', 'pandaren_horde', 'tauren', 'troll', 'undead', 'void_elf', 'vulpera', 'worgen', 'zandalari_troll', 'forsaken', 'dracthyr', 'earthen', 'earthen_dwarf', 'haranir', 'harronir', 'harronir_horde', 'harronir_alliance'],
-           case_sensitive=False,
-           scope='player'),
+           case_sensitive=False, scope='player', required=True),
     Option('timeofday', ['day', 'daytime', 'night', 'nighttime'], scope='player'),
     # copied from util::role_type_string
     Option('role', ['attack', 'spell', 'hybrid', 'dps', 'tank', 'heal', 'auto'], scope='player'),
     # copied from util::position_type_string
     Option('position', ['none', 'back', 'front', 'ranged_back', 'ranged_front'], scope='player'),
     # talents
-    Option('talents', scope='player'),
+    Option('talents', scope='player', required=True),
     # gear
-    Option('head', scope='player'),
-    Option('neck', scope='player'),
-    Option('shoulders', scope='player'),
-    Option('shoulder', scope='player'),
-    Option('chest', scope='player'),
-    Option('waist', scope='player'),
-    Option('legs', scope='player'),
-    Option('leg', scope='player'),
-    Option('feet', scope='player'),
-    Option('foot', scope='player'),
-    Option('wrists', scope='player'),
-    Option('wrist', scope='player'),
-    Option('hands', scope='player'),
-    Option('hand', scope='player'),
-    Option('finger1', scope='player'),
-    Option('finger2', scope='player'),
-    Option('ring1', scope='player'),
-    Option('ring2', scope='player'),
-    Option('trinket1', scope='player'),
-    Option('trinket2', scope='player'),
-    Option('back', scope='player'),
-    Option('main_hand', scope='player'),
+    Option('head', scope='player', required=True),
+    Option('neck', scope='player', required=True),
+    Option(['shoulder', 'shoulders'], alias='shoulder', scope='player', required=True),
+    Option('chest', scope='player', required=True),
+    Option('waist', scope='player', required=True),
+    Option(['leg', 'legs'], alias='leg', scope='player', required=True),
+    Option(['foot', 'feet'], alias='foot', scope='player', required=True),
+    Option(['wrist', 'wrists'], alias='wrist', scope='player', required=True),
+    Option(['hand', 'hands'], alias='hand', scope='player', required=True),
+    Option(['finger1', 'ring1'], alias='finger1', scope='player', required=True),
+    Option(['finger2', 'ring2'], alias='finger2', scope='player', required=True),
+    Option('trinket1', scope='player', required=True),
+    Option('trinket2', scope='player', required=True),
+    Option('back', scope='player', required=True),
+    Option('main_hand', scope='player', required=True),
     Option('off_hand', scope='player'),
     # consumables
     Option('potion', scope='player'),
@@ -141,21 +156,17 @@ SIMC_OPTIONS = Options(
 HEADER_OPTIONS = Options(
     Option('desired_targets', scope='sim'),
     Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
-    Option('source', ['default'], scope='player'),
-    # consumables
-    Option('potion', scope='player'),
-    Option('flask', scope='player'),
-    Option('food', scope='player'),
-    Option('augmentation', scope='player'),
-    Option('temporary_enchant', scope='player'),
+    Option('profile_type', simc_option=False, scope='header')
 )
 
 class Profile:
     path: Path
     params: list[str]
+    observed_options: set[Option]
 
     def __init__(self, path):
         self.path = Path(path)
+        self.observed_options = set()
 
     def __str__(self):
         return str(self.path)
@@ -171,8 +182,8 @@ class Profile:
             print(f'Path {self} does not exist.')
             return False
 
-        class_name, trailing_fragment, spec_name = self.path_parts()
-        if not class_name and not trailing_fragment and not spec_name:
+        class_name, spec_name, suffix = self.path_parts()
+        if not class_name or not spec_name:
             return False
 
         if class_name not in SPEC_NAMES.keys():
@@ -184,15 +195,15 @@ class Profile:
             return False
 
         # python has no way to nicely test if a string contains only printable ascii characters :)
-        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in trailing_fragment[len(spec_name):])):
-            print(f'Profile {self} trailing fragment {trailing_fragment[len(spec_name):]} is not alphanumeric.')
+        if not all((c in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_' for c in suffix)):
+            print(f'Profile {self} suffix {suffix} is not alphanumeric.')
             return False
 
         return True
 
     def expected_name(self):
-        class_name, trailing_fragment, _ = self.path_parts()
-        return f'{class_name}_{trailing_fragment}'
+        class_name, spec_name, suffix = self.path_parts()
+        return f'{class_name}_{spec_name}{"" if suffix == "" else "_"}{suffix}'
 
     def path_parts(self):
         path_parts = PurePath.relative_to(self.path.resolve(), Path(__file__).resolve(), walk_up=True).parts[2:]
@@ -201,7 +212,12 @@ class Profile:
             return False, False, False
 
         trailing_fragment = path_parts[2].split('.')[:-1][0]
-        return path_parts[1], trailing_fragment, trailing_fragment.split('_')[0]
+        spec_name = trailing_fragment.split('_')[0]
+        suffix = '_'.join(trailing_fragment.split('_')[1:])
+        return path_parts[1], spec_name, suffix
+
+    def related_profiles(self):
+        return self.path.parent.glob(f'{self.path_parts()[1]}*.simc')
 
 class ParsedOption:
     profile: Profile
@@ -246,7 +262,7 @@ class ParsedOption:
         return f'{self.key}{self.operator}{self.value}'
 
     def option(self, options: Options):
-        return next((o for o in options if o == self))
+        return self in options and next((o for o in options if o == self)) or None
 
     def validate(self, options: Options):
         return self.parsed and self.validate_key(options) and self.validate_value(options)

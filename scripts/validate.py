@@ -1,10 +1,19 @@
 from argparse import ArgumentParser
+from collections import Counter
 from dataclasses import dataclass
 from difflib import ndiff
 from json import loads
 from urllib.request import Request, urlopen
 
 from shared import ParsedOption, Profile, HEADER_OPTIONS, SIMC_OPTIONS
+
+def find_option(option_key: str, profile: Profile):
+    with open(profile) as handle:
+        for line in handle.readlines():
+            line = line.strip()
+            option = ParsedOption(line[1:].strip() if len(line) and line[0] == '#' else line, profile)
+            if option.key == option_key:
+                yield option
 
 def parse_header_option(line: str, profile: Profile):
     option = ParsedOption(line, profile)
@@ -14,6 +23,7 @@ def parse_header_option(line: str, profile: Profile):
         print(f'Profile {profile} has invalid Header option {option}.')
         return False
 
+    profile.observed_options.add(option.option(HEADER_OPTIONS))
     return True
 
 def parse_simc_option(line: str, profile: Profile):
@@ -29,15 +39,40 @@ def parse_simc_option(line: str, profile: Profile):
         print(f'Profile {profile} has invalid Profile option {option}.')
         return False
 
+    profile.observed_options.add(option.option(SIMC_OPTIONS))
     return True
 
+def validate_unique_option_key(option_key: str, profile: Profile):
+    relatives = set(profile.related_profiles())
+    observed = []
+    for relative in relatives:
+        observed += list(find_option(option_key, relative))
+    options_as_str = (str(s) for s in observed)
+    duplicate_options = list(k for k, v in (Counter(options_as_str) - Counter(options_as_str)).items() if v > 1)
+
+    if len(duplicate_options):
+        print(f'More than one profile in the {" ".join(profile.path_parts()[:1])}' \
+              f' family contains {", ".join(duplicate_options)}. This ' \
+              'option must have a unique value in each profile it exists in.')
+        for duplicate in duplicate_options:
+            print(duplicate)
+            for option in observed:
+                if str(option) == duplicate:
+                    print(f'  {option.profile}')
+        return False
+
+    return True
+
+def validate_missing_options(profile: Profile):
+    missing_options = (SIMC_OPTIONS.required | HEADER_OPTIONS.required) - profile.observed_options
+    for option in missing_options:
+        print(f'Profile {profile} is missing {option}.')
+
+    return len(missing_options) == 0
+
 def validate(profile: Profile):
-    success = True
+    success = profile.validate()
 
-    if not profile.validate():
-        success = False
-
-    class_name, trailing_fragment, _ = profile.path_parts()
     with open(profile) as handle:
         header = True
         for line in handle.readlines():
@@ -46,12 +81,14 @@ def validate(profile: Profile):
                 continue
             if line[0] == '#':
                 if header:
-                    if not parse_header_option(line[1:].strip(), profile):
-                        success = False
+                    success &= parse_header_option(line[1:].strip(), profile)
             else:
                 header = False
-                if not parse_simc_option(line, profile):
-                    success = False
+                success &= parse_simc_option(line, profile)
+
+    success &= validate_unique_option_key('profile_type', profile)
+    success &= validate_missing_options(profile)
+
     return success
 
 def validate_seasonal(profile: Profile):
