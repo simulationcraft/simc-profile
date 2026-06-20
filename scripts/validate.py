@@ -5,7 +5,7 @@ from difflib import ndiff
 from json import loads
 from urllib.request import Request, urlopen
 
-from shared import ParsedOption, Profile, HEADER_OPTIONS, SIMC_OPTIONS
+from shared import ParsedOption, Profile, Options, HEADER_OPTIONS, SIMC_OPTIONS
 
 def find_option(option_key: str, profile: Profile):
     with open(profile) as handle:
@@ -14,6 +14,16 @@ def find_option(option_key: str, profile: Profile):
             option = ParsedOption(line[1:].strip() if len(line) and line[0] == '#' else line, profile)
             if option.key == option_key:
                 yield option
+
+def has_option_with_value(option_key: str, option_value: str, profile: Profile, options: Options):
+    # repeating option with key `foo` will cause all but the last value to be
+    # discarded in many contexts. given the simplified nature of profiles,
+    # this is strictly true.
+    matches = list(find_option(option_key, profile))
+    if not len(matches):
+        return False
+    option = matches[-1]
+    return option.validate(options) and option.value == '1'
 
 def parse_header_option(line: str, profile: Profile):
     option = ParsedOption(line, profile)
@@ -135,15 +145,15 @@ def validate_seasonal(profile: Profile):
                 print(f'  {entry}')
         print()
 
-    print(f'\n\033[94m{profile}\033[0m')
     with open(profile) as handle:
         lines = handle.read()
+        is_ptr = has_option_with_value('ptr', '1', profile, HEADER_OPTIONS)
+        print(f'\n\033[94m{profile}\033[0m{" (ptr=1)" if is_ptr else ""}')
+        url = f"https://{'mimiron' if is_ptr else 'www'}.raidbots.com/api/simc/input/normalize"
         data = f'{{"text": "{lines.encode("unicode_escape").decode("utf-8")}"}}'.encode('utf-8')
-        request = Request('https://www.raidbots.com/api/simc/input/normalize',
-                          data=data,
+        request = Request(url, data=data, method='POST',
                           headers={'Content-Type': 'application/json',
-                                   'User-Agent': 'simc-profile'},
-                          method='POST')
+                                   'User-Agent': 'simc-profile'} )
 
         with urlopen(request) as response:
             body = response.read()
