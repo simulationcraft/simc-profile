@@ -154,6 +154,7 @@ SIMC_OPTIONS = Options(
 )
 
 HEADER_OPTIONS = Options(
+    Option('ptr', ['0', '1'], scope='sim'),
     Option('desired_targets', scope='sim'),
     Option('fight_style', ['patchwerk', 'castingpatchwerk', 'dungeonslice'], scope='sim'),
     Option('profile_type', simc_option=False, scope='header')

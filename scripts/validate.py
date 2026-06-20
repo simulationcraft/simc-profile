@@ -5,7 +5,7 @@ from difflib import ndiff
 from json import loads
 from urllib.request import Request, urlopen
 
-from shared import ParsedOption, Profile, HEADER_OPTIONS, SIMC_OPTIONS
+from shared import ParsedOption, Profile, Options, HEADER_OPTIONS, SIMC_OPTIONS
 
 def find_option(option_key: str, profile: Profile):
     with open(profile) as handle:
@@ -15,62 +15,72 @@ def find_option(option_key: str, profile: Profile):
             if option.key == option_key:
                 yield option
 
-def parse_header_option(line: str, profile: Profile):
-    option = ParsedOption(line, profile)
-
-    # only validate header options if they look like they could be options
-    if option.validate_key(HEADER_OPTIONS) and not option.validate_value(HEADER_OPTIONS):
-        print(f'Profile {profile} has invalid Header option {option}.')
+def has_option_with_value(option_key: str, option_value: str, profile: Profile, options: Options):
+    # repeating option with key `foo` will cause all but the last value to be
+    # discarded in many contexts. given the simplified nature of profiles,
+    # this is strictly true.
+    matches = list(find_option(option_key, profile))
+    if not len(matches):
         return False
-
-    profile.observed_options.add(option.option(HEADER_OPTIONS))
-    return True
-
-def parse_simc_option(line: str, profile: Profile):
-    option = ParsedOption(line, profile)
-    if not option.validate_key(SIMC_OPTIONS):
-        print(f'Profile {profile} has invalid Profile option {option.key}.', end='')
-        if option.validate_key(HEADER_OPTIONS):
-            print(' Perhaps this option was intended to be placed in header?')
-        else:
-            print()
-        return False
-    elif not option.validate_value(SIMC_OPTIONS):
-        print(f'Profile {profile} has invalid Profile option {option}.')
-        return False
-
-    profile.observed_options.add(option.option(SIMC_OPTIONS))
-    return True
-
-def validate_unique_option_key(option_key: str, profile: Profile):
-    relatives = set(profile.related_profiles())
-    observed = []
-    for relative in relatives:
-        observed += list(find_option(option_key, relative))
-    options_as_str = (str(s) for s in observed)
-    duplicate_options = list(k for k, v in (Counter(options_as_str) - Counter(options_as_str)).items() if v > 1)
-
-    if len(duplicate_options):
-        print(f'More than one profile in the {" ".join(profile.path_parts()[:1])}' \
-              f' family contains {", ".join(duplicate_options)}. This ' \
-              'option must have a unique value in each profile it exists in.')
-        for duplicate in duplicate_options:
-            print(duplicate)
-            for option in observed:
-                if str(option) == duplicate:
-                    print(f'  {option.profile}')
-        return False
-
-    return True
-
-def validate_missing_options(profile: Profile):
-    missing_options = (SIMC_OPTIONS.required | HEADER_OPTIONS.required) - profile.observed_options
-    for option in missing_options:
-        print(f'Profile {profile} is missing {option}.')
-
-    return len(missing_options) == 0
+    option = matches[-1]
+    return option.validate(options) and option.value == '1'
 
 def validate(profile: Profile):
+    def parse_header_option(line: str, profile: Profile):
+        option = ParsedOption(line, profile)
+
+        # only validate header options if they look like they could be options
+        if option.validate_key(HEADER_OPTIONS) and not option.validate_value(HEADER_OPTIONS):
+            print(f'Profile {profile} has invalid Header option {option}.')
+            return False
+
+        profile.observed_options.add(option.option(HEADER_OPTIONS))
+        return True
+
+    def parse_simc_option(line: str, profile: Profile):
+        option = ParsedOption(line, profile)
+        if not option.validate_key(SIMC_OPTIONS):
+            print(f'Profile {profile} has invalid Profile option {option.key}.', end='')
+            if option.validate_key(HEADER_OPTIONS):
+                print(' Perhaps this option was intended to be placed in header?')
+            else:
+                print()
+            return False
+        elif not option.validate_value(SIMC_OPTIONS):
+            print(f'Profile {profile} has invalid Profile option {option}.')
+            return False
+
+        profile.observed_options.add(option.option(SIMC_OPTIONS))
+        return True
+
+    def validate_unique_option_key(option_key: str, profile: Profile):
+        relatives = set(profile.related_profiles())
+        observed = []
+        for relative in relatives:
+            observed += list(find_option(option_key, relative))
+        options_as_str = (str(s) for s in observed)
+        duplicate_options = list(k for k, v in (Counter(options_as_str) - Counter(options_as_str)).items() if v > 1)
+
+        if len(duplicate_options):
+            print(f'More than one profile in the {" ".join(profile.path_parts()[:1])}' \
+                f' family contains {", ".join(duplicate_options)}. This ' \
+                'option must have a unique value in each profile it exists in.')
+            for duplicate in duplicate_options:
+                print(duplicate)
+                for option in observed:
+                    if str(option) == duplicate:
+                        print(f'  {option.profile}')
+            return False
+
+        return True
+
+    def validate_missing_options(profile: Profile):
+        missing_options = (SIMC_OPTIONS.required | HEADER_OPTIONS.required) - profile.observed_options
+        for option in missing_options:
+            print(f'Profile {profile} is missing {option}.')
+
+        return len(missing_options) == 0
+
     success = profile.validate()
 
     with open(profile) as handle:
@@ -92,6 +102,15 @@ def validate(profile: Profile):
     return success
 
 def validate_seasonal(profile: Profile):
+    def create_request(profile: Profile):
+        is_ptr = has_option_with_value('ptr', '1', profile, HEADER_OPTIONS)
+        with open(profile) as handle:
+            return Request(f"https://{'mimiron' if is_ptr else 'www'}.raidbots.com/api/simc/input/normalize",
+                           data=f'{{"text": "{handle.read().encode("unicode_escape").decode("utf-8")}"}}'.encode('utf-8'),
+                           method='POST',
+                           headers={'Content-Type': 'application/json',
+                                    'User-Agent': 'simc-profile'} ), is_ptr
+
     @dataclass
     class Change:
         description: str
@@ -121,7 +140,7 @@ def validate_seasonal(profile: Profile):
                 color_line(L) for L in lines
             ))
 
-    def print_entries(entry_type, entries):
+    def print_entries(entry_type: str, entries: dict):
         if not len(entries):
             return
 
@@ -135,37 +154,30 @@ def validate_seasonal(profile: Profile):
                 print(f'  {entry}')
         print()
 
-    print(f'\n\033[94m{profile}\033[0m')
-    with open(profile) as handle:
-        lines = handle.read()
-        data = f'{{"text": "{lines.encode("unicode_escape").decode("utf-8")}"}}'.encode('utf-8')
-        request = Request('https://www.raidbots.com/api/simc/input/normalize',
-                          data=data,
-                          headers={'Content-Type': 'application/json',
-                                   'User-Agent': 'simc-profile'},
-                          method='POST')
+    def print_changes(parsed_json: dict):
+        changes = parsed_json.get('changes', [])
+        if not len(changes):
+            return
 
-        with urlopen(request) as response:
-            body = response.read()
-            encoding = response.info().get_content_charset('utf-8')
-            parsed_json = loads(body.decode(encoding))
+        print('Suggested Profile:')
+        modified = parsed_json.get('input').split('\n')
+        for line in modified:
+            if not line.startswith('# normalized by Raidbots'):
+                print(line)
 
-            fields = ('warnings', 'ignoredOptions', 'invalidCommands', 'changes')
-            [print_entries(entry, parsed_json.get(entry)) for entry in fields]
+    request, is_ptr = create_request(profile)
+    with urlopen(request) as response:
+        encoding = response.info().get_content_charset('utf-8')
+        parsed_json = loads(response.read().decode(encoding))
 
-            if len(parsed_json.get('changes', [])):
-                print('Suggested Profile:')
-                modified = parsed_json.get('input').split('\n')
-                for line in modified:
-                    if not line.startswith('# normalized by Raidbots'):
-                        print(line)
+        fields = ('warnings', 'ignoredOptions', 'invalidCommands', 'changes')
+        if not any((len(parsed_json.get(entry, [])) for entry in fields)):
+            return True
 
-            if any((len(parsed_json.get(entry, [])) for entry in fields)):
-                return False
-            else:
-                print('Ok! Raidbots Seasonal Configuration provided no suggestions.')
-
-    return True
+        print(f'\n\033[94m{profile}\033[0m{" (ptr=1)" if is_ptr else ""}')
+        [print_entries(entry, parsed_json.get(entry)) for entry in fields]
+        print_changes(parsed_json)
+        return False
 
 parser = ArgumentParser(prog='SimulationCraft Profile Validator')
 parser.add_argument('filenames', nargs='*', type=Profile)
