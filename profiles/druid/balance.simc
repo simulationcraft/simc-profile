@@ -8,7 +8,7 @@ position=back
 talents=CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZYmZswyMLzMGzshhBYstMzgxsNCMBAAAYxMzMzgNDjxAAwMDMA
 
 head=branches_of_the_luminous_bloom,id=250024,bonus_id=13575/13575/13575/13575/13575/13575/13575/13575/13575/13575/13668,ilevel=289,gem_id=240983,enchant_id=8017
-neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,gem_id=240983
+neck=amulet_of_the_abyssal_hymn,id=250247,ilevel=289,gem_id=240983,bonus_id=13668
 shoulder=seedpods_of_the_luminous_bloom,id=250022,bonus_id=13574/13574/13574/13574/13574/13574/13574/13574/13574/13574,ilevel=289,enchant_id=8031
 back=adherents_silken_shroud,id=239656,bonus_id=8960/12066/12214/12384/13622/13667/9627,crafted_stats=32/36
 chest=trunk_of_the_luminous_bloom,id=250027,bonus_id=13575/13575/13575/13575/13575/13575/13575/13575/13575/13575,ilevel=289,enchant_id=7987
