@@ -12,7 +12,7 @@ jobs:
 
     outputs:
       cache-key: simc-clang++-18-cpp17-${{ env.SHA }}
-      cache-miss: ${{ steps.restore_cache.outputs.cache-hit }}
+      cache-hit: ${{ steps.restore_cache.outputs.cache-hit }}
 
     steps:
       - uses: actions/checkout@v6
