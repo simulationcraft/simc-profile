@@ -57,7 +57,7 @@ jobs:
       - uses: ./.github/workflows/build
         id: build
         with:
-          cache-key: ${{ fromJson( needs.setup.outputs.cache-key }}
+          cache-key: ${{ fromJson( needs.setup.outputs.cache-key ) }}
 
       - name: validate_simc_main
         run: |
