@@ -41,7 +41,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-        if: ${{
 
       - name: validate_python_main
         run: |
