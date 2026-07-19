@@ -7,7 +7,8 @@ inputs:
     default: true
 
 outputs:
-  cache-hit: ${{ steps.restore_cache.outputs.cache-hit }}
+  cache-hit:
+    value: ${{ steps.restore_cache.outputs.cache-hit }}
 
 runs:
   using: 'composite'
