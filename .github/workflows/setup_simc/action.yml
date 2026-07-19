@@ -1,11 +1,5 @@
 name: setup_simc
 
-inputs:
-  build-simc:
-    required: false
-    type: boolean
-    default: true
-
 outputs:
   cache-hit:
     value: ${{ steps.restore_cache.outputs.cache-hit }}
@@ -28,6 +22,6 @@ runs:
         key: simc-clang++-18-cpp17-${{ steps.clone_simc.outputs.commit }}
 
     - uses: ./.github/workflows/build_simc
-      if: ${{ !inputs.build-simc && steps.restore_cache.outputs.cache-hit != 'true' }}
+      if: ${{ steps.restore_cache.outputs.cache-hit != 'true' }}
       with:
         cache-key: ${{ steps.restore_cache.outputs.cache-primary-key }}
