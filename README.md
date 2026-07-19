@@ -1,15 +1,7 @@
-# [SimulationCraft](https://www.simulationcraft.org/) Profiles [![ci](https://github.com/simulationcraft/simc-profile/actions/workflows/ci-main.yml/badge.svg)](https://github.com/simulationcraft/simc-profile/actions/workflows/ci-main.yml)
+# [SimulationCraft](https://www.simulationcraft.org/) Profiles [![ci](https://github.com/simulationcraft/simc-profile/actions/workflows/ci.yml/badge.svg)](https://github.com/simulationcraft/simc-profile/actions/workflows/ci.yml)
 
 ## What are Profiles?
 SimulationCraft profiles contained within this repository are sample gear and talent configurations for the current tier. These profiles are somewhat arbitrary, and no expectation that profiles are optimal should exist.
-
-There are some basic rules that all profiles must follow:
-* Files match the pattern `<class>/<spec>[a-zA-Z0-9_]*.simc`.
-* Character name must match file path.
-* All gear must be obtainable in game.
-* Talent strings must be valid. Due to implementation details of the talent system, they may require frequent updates.
-* May only override defaults for consumables.
-* May include context-relevant options such as `fight_style`, and `desired_targets`.
 
 ## Why have Profiles moved?
 Profiles historically were an important component used to test SimulationCraft prior to the implementation of several features that allow for testing to occur that is less vulnerable to talent and gear configuration rot.
@@ -29,3 +21,86 @@ We always welcome Pull Requests for new or updated profiles for any specializati
 A tutorial on how to create a Pull Request is available [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 
 If you have further questions, feel free to contact us through the SimCMinMax Discord.
+
+## What options are allowed in Profiles?
+Profiles include a group of standard SimC options as well as an optional set of Header options.
+
+Header options are commented out (the first non-whitespace character on the line is `#`) and come before all SimC options.
+E.g.
+```
+# Header Options (this is a comment and not required)
+# ptr=1
+# fight_style=patchwerk
+
+warrior=warrior_arms
+# Header Options beyond this point are discarded
+# ... rest of profile
+```
+
+Profiles may have the following set of Header options:
+- `ptr` (`1` or `0`, configures CI to use `ptr` spell data, check against `mimiron` seasonal rules and suggestions, indicates profile is for future tier)
+- `desired_targets`
+- `fight_style` (`patchwerk`, `castingpatchwerk`, `dungeonslice`)
+- `profile_type` (`default`, `m+`, `raid`, informs users what content the profile is intended for)
+
+SimC options are all standard options permitted in the SimC textual configuration interface. Reference the [SimulationCraft Wiki](https://github.com/simulationcraft/simc/wiki) for examples and documentation.
+
+Profiles must have the following set of SimC options:
+- `level` (only current maximum level permitted)
+- `spec` (must match filename)
+- `race`
+- `talents`
+- `head`
+- `neck`
+- `shoulder` (or `shoulders`)
+- `chest`
+- `waist`
+- `leg` (or `legs`)
+- `foot` (or `feet`)
+- `wrist` (or `wrists`)
+- `hand` (or `hands`)
+- `finger1` (or `ring1`)
+- `finger2` (or `ring2`)
+- `trinket1`
+- `trinket2`
+- `back`
+- `main_hand`
+
+Profiles may have the following set of SimC options:
+- `timeofday` (includes `day` and `night`. night elf racial)
+- `role`
+- `position`
+- `off_hand`
+- `potion`
+- `flask`
+- `food`
+- `augmentation`
+- `temporary_enchant`
+- `warlock.default_pet` (`sayaad`, `succubus`, `incubus`, `felguard`)
+
+Profiles may have the following header options:
+
+## What rules must Profiles follow?
+
+Each profile for a class must be placed in the `profiles/<class>` directory.
+Each profile filename must match the pattern `<spec>[_a-zA-Z0-9]*.simc`.
+E.g.
+```
+profiles/warrior/arms.simc
+profiles/mage/frost_spellslinger.simc
+```
+
+The class and specialization referenced in the profile must correspond with a maintained SimC class module. Alternate specialization names are not permitted.
+
+The actor's name must match the full filename, replacing path separators with `_`.
+E.g.
+```
+$ cat profiles/warrior/arms.simc
+warrior=warrior_arms
+```
+
+Each profile must contain all required options as listed in the previous section.
+
+Each profile passes seasonal rule validation as set forth by Raidbots.
+
+Each profile will successfully run when passed into SimC.
