@@ -100,3 +100,7 @@ warrior=warrior_arms
 ```
 
 Each profile must contain all required options as listed in the previous section.
+
+Each profile passes seasonal rule validation as set forth by Raidbots.
+
+Each profile will successfully run when passed into SimC.
