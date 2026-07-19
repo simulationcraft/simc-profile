@@ -6,6 +6,9 @@ inputs:
     type: boolean
     default: true
 
+outputs:
+  cache-hit: ${{ steps.restore_cache.outputs.cache-hit }}
+
 runs:
   using: 'composite'
 
