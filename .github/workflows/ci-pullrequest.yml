@@ -4,7 +4,7 @@ on:
   pull_request
 
 jobs:
-  CI:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,22 +22,21 @@ jobs:
           python ${{ runner.workspace }}/simc-profile/scripts/validate.py \
           ${{ env.MODIFIED_FILES }} --validate
 
-      - name: validate_seasonal_python_pr
+      - name: validate_seasonal_python
         if: github.event_name == 'pull_request'
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/validate.py \
           ${{ env.MODIFIED_FILES }} --validate-seasonal
 
       - uses: ./.github/workflows/setup_simc
-        id: setup
 
-      - name: validate_simc_pr
+      - name: validate_simc
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
           --save .
 
-      - name: execute_simc_pr
+      - name: execute_simc
         run: |
           python ${{ runner.workspace }}/simc-profile/scripts/execute.py \
           ${{ env.MODIFIED_FILES }} -b ${{ runner.workspace }}/simc-profile/simc-profile/simc/b/ninja/simc \
