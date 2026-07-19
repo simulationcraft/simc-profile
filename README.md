@@ -1,4 +1,4 @@
-# [SimulationCraft](https://www.simulationcraft.org/) Profiles [![CI](https://github.com/simulationcraft/simc-profile/workflows/CI/badge.svg)](https://github.com/simulationcraft/simc-profile/actions?query=workflow%3ACI)
+# [SimulationCraft](https://www.simulationcraft.org/) Profiles [![ci](https://github.com/simulationcraft/simc-profile/actions/workflows/ci-main.yml/badge.svg)](https://github.com/simulationcraft/simc-profile/actions/workflows/ci-main.yml)
 
 ## What are Profiles?
 SimulationCraft profiles contained within this repository are sample gear and talent configurations for the current tier. These profiles are somewhat arbitrary, and no expectation that profiles are optimal should exist.
