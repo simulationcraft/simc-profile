@@ -46,7 +46,9 @@ def generate_simc_input(profiles: list[Profile]):
                     deferred_options = []
 
 def run_sim(binary: Path, profiles: list[str], prefix: list[str], suffix: list[str] = []):
-    proc = subprocess.Popen([binary] + prefix + profiles + suffix, stdout=sys.stdout, stderr=sys.stderr)
+    params = [binary, *prefix, *profiles, *suffix]
+    print(*params, sep=' ')
+    proc = subprocess.Popen(params, stdout=sys.stdout, stderr=sys.stderr)
     proc.wait()
     return proc.returncode
 
@@ -56,23 +58,26 @@ def print_dps_data(filename: Path):
     return proc.returncode
 
 def save_profiles(binary: Path, profiles: list[Profile], location: Path):
-    params = [
-        'single_actor_batch=1',
-    ]
+    rc = []
     for profile in profiles:
-        params += profile.params
-        params += [f'save={location}/{profile.expected_name()}.simc']
-    return run_sim(binary, params, ['output=/dev/null'])
+        print(f'Save Profile: {profile}')
+        rc.append(run_sim(binary, profile.params, ['output=/dev/null'], [f'save={location}/{profile.expected_name()}.simc']))
+    return rc
 
 def run_profiles(binary: Path, profiles: list[Profile], location: Path):
+    rc = []
     prefix = [
-        'single_actor_batch=1',
-        'output=/dev/null',
         'target_error=0.05',
-        f'json={location}/output.json',
-        f'html={location}/output.html'
+        'output=/dev/null',
     ]
-    return run_sim(binary, [line for profile in profiles for line in profile.params], prefix)
+    for profile in profiles:
+        suffix = [
+            f'json={location}/output_{profile.expected_name()}.json',
+            f'html={location}/output_{profile.expected_name()}.html'
+        ]
+        print(f'Run Profile: {profile}')
+        rc.append(run_sim(binary, profile.params, prefix, suffix))
+    return rc
 
 parser = ArgumentParser(prog='SimulationCraft Profile Runner')
 parser.add_argument('filenames', nargs='*', type=Profile)
@@ -89,11 +94,10 @@ if not len(args.filenames):
 
 rc = []
 if args.save:
-    rc.append(save_profiles(args.binary, args.filenames, args.save))
+    rc += save_profiles(args.binary, args.filenames, args.save)
 
 if args.execute:
-    rc.append(run_profiles(args.binary, args.filenames, args.execute))
-    rc.append(print_dps_data(f'{args.execute}/output.json'))
+    rc += run_profiles(args.binary, args.filenames, args.execute)
 
 print(rc)
 exit(max(rc))
